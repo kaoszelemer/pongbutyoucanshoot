@@ -1,9 +1,33 @@
 gameStartTimer = love.timer.getTime()
+
+ripple = require('ripple')
+
 local t, shakeDuration, shakeMagnitude = 0, -1, 0
 
 local function startShake(duration, magnitude)
     
     t, shakeDuration, shakeMagnitude = 0, duration or 1, magnitude or 5
+end
+
+local function loadSounds()
+
+    local pongsrc = love.audio.newSource('pong.wav', 'static')
+    pongSFX = ripple.newSound(pongsrc)
+    
+    local pingsrc = love.audio.newSource('ping.wav', 'static')
+    pingSFX = ripple.newSound(pingsrc)
+
+    local hitsrc = love.audio.newSource('hit.wav', 'static')
+    hitSFX = ripple.newSound(hitsrc)
+    
+    local powerupsrc = love.audio.newSource('powerup.wav', 'static')
+    powerupSFX = ripple.newSound(powerupsrc)
+    
+    local shootsrc = love.audio.newSource('shoot.wav', 'static')
+    shootSFX = ripple.newSound(shootsrc)
+
+
+
 end
 
 local function shoot(y)
@@ -18,10 +42,13 @@ local function shoot(y)
         isShooting = false
     end
 
+    local instance = shootSFX:play()
+
 end
 
 local function enemyShoot(y)
     ENEMYBULLET.y = y
+    local instance = shootSFX:play()
 end
 
 local function start()
@@ -59,6 +86,23 @@ local function bounce(x, y)
     BALL.vel.x = x * BALL.vel.x
     BALL.vel.y = y * BALL.vel.y
 
+    if BALL.vel.x < 0 then
+        local instance = pongSFX:play()
+    else
+        local instance = pingSFX:play()
+    end
+
+end
+
+local function resetPowerUp(s)
+    if s == "su" then
+        POWERUP.speedUp.x = love.math.random(50, SCREENWIDTH - 50)
+        POWERUP.speedUp.y = love.math.random(10, SCREENHEIGHT - 50)
+    end
+    if s == "sd" then
+        POWERUP.speedDown.x = love.math.random(50, SCREENWIDTH - 50)
+        POWERUP.speedDown.y = love.math.random(10, SCREENHEIGHT - 50)
+    end
 end
 
 local function powerUp(whatdo)
@@ -67,17 +111,15 @@ local function powerUp(whatdo)
         if PLAYER.vel <= 5 then
             PLAYER.vel = PLAYER.vel + POWERUP.speedUp.modifier
         end
-        POWERUP.speedUp.x = love.math.random(50, SCREENWIDTH - 50)
-        POWERUP.speedUp.y = love.math.random(10, SCREENHEIGHT - 50)
-        isSpeedUpOnMap = false
+        resetPowerUp("su")
+      
 
     elseif whatdo == "speeddown" then
-        if PLAYER.vel > 0 then
+        if PLAYER.vel > 1 then
             PLAYER.vel = PLAYER.vel + POWERUP.speedDown.modifier
         end
-        POWERUP.speedDown.x = love.math.random(50, SCREENWIDTH - 50)
-        POWERUP.speedDown.y = love.math.random(10, SCREENHEIGHT - 50)
-        isSpeedDownOnMap = false
+        resetPowerUp("sd")
+       
 
     elseif whatdo == "ballspeedup" then
         if BALL.vel.x > 0 and BALL.vel.x <= 8 then
@@ -85,8 +127,8 @@ local function powerUp(whatdo)
         elseif BALL.vel.x < 0 and BALL.vel.x >= -8 then
             BALL.vel.x = BALL.vel.x - POWERUP.speedUp.modifier
         end
-        POWERUP.speedUp.x = love.math.random(50, SCREENWIDTH - 50)
-        POWERUP.speedUp.y = love.math.random(10, SCREENHEIGHT - 50)
+        resetPowerUp("su")
+    
     elseif whatdo == "ballspeeddown" then
         if BALL.vel.x > 0 then
             BALL.vel.x = BALL.vel.x + POWERUP.speedDown.modifier
@@ -99,11 +141,21 @@ local function powerUp(whatdo)
                 BALL.vel.x = 1
             end
         end
-        POWERUP.speedDown.x = love.math.random(50, SCREENWIDTH - 50)
-        POWERUP.speedDown.y = love.math.random(10, SCREENHEIGHT - 50)
-
+        resetPowerUp("sd")
+    elseif whatdo == "enemyspeedup" then
+        if ENEMY.vel <= 4 then
+            ENEMY.vel = ENEMY.vel + POWERUP.speedUp.modifier
+        end
+        resetPowerUp("su")
+    elseif whatdo == "enemyspeeddown" then
+        if ENEMY.vel > 1 then
+            ENEMY.vel = ENEMY.vel + POWERUP.speedDown.modifier
+        end
+        resetPowerUp("sd")
     end
 
+    local instance = powerupSFX:play()
+ 
 
 end
 
@@ -117,6 +169,11 @@ function love.load()
 
     love.window.setMode(SCREENWIDTH, SCREENHEIGHT)
     love.window.setTitle("Pong csak lehet loni")
+
+    hpImage = love.graphics.newImage("hp.png")
+
+
+    loadSounds()
 
     PLAYER = {}
     PLAYER.img = love.graphics.newImage("player.png")
@@ -132,6 +189,7 @@ function love.load()
     ENEMY.img = love.graphics.newImage("enemy.png")
     ENEMY.x = SCREENWIDTH - PLAYER.imgWidth
     ENEMY.y = 0
+    ENEMY.vel = 2
     ENEMY.HP = 10
 
     BALL = {}
@@ -226,9 +284,9 @@ function love.update(dt)
    -- AI
 
    if BALL.y < ENEMY.y + PLAYER.imgHeight / 2  then
-    ENEMY.y = ENEMY.y - 2
+    ENEMY.y = ENEMY.y - ENEMY.vel
    elseif BALL.y > ENEMY.y + PLAYER.imgHeight / 2 then
-    ENEMY.y = ENEMY.y + 2
+    ENEMY.y = ENEMY.y + ENEMY.vel
    end
 
 
@@ -270,7 +328,7 @@ function love.update(dt)
          
             ENEMY.HP = ENEMY.HP - 1
             BULLET.x = 0
-            
+            local instance = hitSFX:play()
             isShooting = false
         
 
@@ -279,7 +337,6 @@ function love.update(dt)
             end
         end
     end
-
     
     if ENEMY.y == PLAYER.y and isEnemyShooting == false then 
     
@@ -289,11 +346,12 @@ function love.update(dt)
      
          
     end
+
     if isEnemyShooting then
-        print(ENEMYBULLET.x, PLAYER.x)
-        if ENEMYBULLET.x == 6 and (ENEMYBULLET.y < PLAYER.y + PLAYER.imgHeight and ENEMYBULLET.y > PLAYER.y - PLAYER.imgHeight) then
-            print("bb")
+       
+        if ENEMYBULLET.x == 6 and (ENEMYBULLET.y < PLAYER.y + PLAYER.imgHeight and ENEMYBULLET.y > PLAYER.y) then
             PLAYER.lives = PLAYER.lives - 1
+            local instance = hitSFX:play()
         end
     end
 
@@ -304,16 +362,38 @@ function love.update(dt)
         powerUp("speedup")
         BULLET.x = 0
         isShooting = false
+        isSpeedUpOnMap = false
        
     end
     
-    --powerup player spdup
+    --powerup player spddwn
 
     if (BULLET.x >= POWERUP.speedDown.x and BULLET.x <= POWERUP.speedDown.x + 32) and (BULLET.y >= POWERUP.speedDown.y and BULLET.y <= POWERUP.speedDown.y + 32) then
     
         powerUp("speeddown")
         BULLET.x = 0
         isShooting = false
+        isSpeedDownOnMap = false
+    end
+
+    --powerup enemy spdup
+
+    if (ENEMYBULLET.x >= POWERUP.speedUp.x and ENEMYBULLET.x <= POWERUP.speedUp.x + 32) and (ENEMYBULLET.y >= POWERUP.speedUp.y and ENEMYBULLET.y <= POWERUP.speedUp.y + 32) then
+    
+        powerUp("enemyspeedup")
+     --   ENEMYBULLET.x = SCREENWIDTH
+        isEnemyShooting = false
+        isSpeedUpOnMap = false
+       
+    end
+
+    -- powerup enemy spddwn
+
+    if (ENEMYBULLET.x >= POWERUP.speedDown.x and ENEMYBULLET.x <= POWERUP.speedDown.x + 32) and (ENEMYBULLET.y >= POWERUP.speedDown.y and ENEMYBULLET.y <= POWERUP.speedDown.y + 32) then
+    
+        powerUp("enemyspeeddown")
+    --    ENEMYBULLET.x = SCREENWIDTH
+        isEnemyShooting = false
         isSpeedDownOnMap = false
     end
 
@@ -337,9 +417,13 @@ function love.update(dt)
 
 
     if love.keyboard.isDown("up") then 
-        PLAYER.y = PLAYER.y - PLAYER.vel
+        if PLAYER.y > 0  then
+            PLAYER.y = PLAYER.y - PLAYER.vel
+        end
     elseif love.keyboard.isDown("down") then
-        PLAYER.y = PLAYER.y + PLAYER.vel
+        if PLAYER.y < SCREENHEIGHT - PLAYER.imgHeight then
+            PLAYER.y = PLAYER.y + PLAYER.vel
+        end
     elseif love.keyboard.isDown("space") then
 
         if isStarting then
@@ -373,29 +457,42 @@ function love.draw()
     end
 
     love.graphics.print("PONG CSAK LEHET LOLNI", SCREENHEIGHT / 2, 0)
-    love.graphics.print("SCORE:"..PLAYER.score, 0, 0)
-    love.graphics.print("LIVES:"..PLAYER.lives, 70, 0)
-    love.graphics.print(BALL.x, BALL.x + 30, BALL.y)
-    love.graphics.print(BALL.y, BALL.x + 60, BALL.y)
+   
+   
+ 
     
     
     love.graphics.draw(PLAYER.img, PLAYER.x, PLAYER.y )
-    love.graphics.print(PLAYER.y, PLAYER.x + 50, PLAYER.y)
+  
     love.graphics.draw(BALL.img, BALL.x, BALL.y)
 
     love.graphics.draw(ENEMY.img, ENEMY.x, ENEMY.y)
-    love.graphics.print(ENEMY.y, ENEMY.x - 50, ENEMY.y)
+ 
     love.graphics.print("HP:"..ENEMY.HP, SCREENWIDTH - 50, 0)
+    for i = 1, ENEMY.HP do
+        love.graphics.draw(hpImage, ((SCREENWIDTH - SCREENWIDTH / 4) - 16) + i * 16, 1)
+    end
+    for i = 1, PLAYER.lives do 
+        love.graphics.draw(hpImage, 16*i, 1)
+    end
 
-    love.graphics.print("PL VEL:"..PLAYER.vel, 0, 20)
-    love.graphics.print("BL VEL:"..BALL.vel.x, 0, 40)
+    if DEBUG then
+        love.graphics.print("PL VEL:"..PLAYER.vel, 0, 60)
+        love.graphics.print("BL VEL:"..BALL.vel.x, 0, 80)
+        love.graphics.print("EN VEL:"..ENEMY.vel, 0, 100)
+        love.graphics.print(BULLET.x, BULLET.x - 10, BULLET.y - 10)
+        love.graphics.print(BALL.x, BALL.x + 30, BALL.y)
+        love.graphics.print(BALL.y, BALL.x + 60, BALL.y)
+        love.graphics.print(PLAYER.y, PLAYER.x + 50, PLAYER.y)
+        love.graphics.print(ENEMY.y, ENEMY.x - 50, ENEMY.y)
+    end
 
     if isGameOver  then
         love.graphics.print("GAME OVER", SCREENWIDTH / 2, SCREENHEIGHT / 2 - 20)
     end
 
     if isShooting then
-        love.graphics.print(BULLET.x, BULLET.x - 10, BULLET.y - 10)
+        
         love.graphics.draw(BULLET.img, BULLET.x + 5, BULLET.y + 5)
     end
 
