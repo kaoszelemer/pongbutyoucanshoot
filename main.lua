@@ -206,13 +206,13 @@ function love.load()
     BULLET.img = love.graphics.newImage("bullet.png")
     BULLET.x = 0
     BULLET.y = PLAYER.y + PLAYER.imgHeight / 2
-    BULLET.vel = 5
+    BULLET.vel = 10
 
     ENEMYBULLET = {}
     ENEMYBULLET.img = love.graphics.newImage("bullet.png")
     ENEMYBULLET.x = SCREENWIDTH
     ENEMYBULLET.y = ENEMY.y + PLAYER.imgHeight / 2
-    ENEMYBULLET.vel = 7
+    ENEMYBULLET.vel = 9
 
 
     POWERUP = {}
