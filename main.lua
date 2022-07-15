@@ -182,13 +182,13 @@ function love.load()
     PLAYER.score = 0
     PLAYER.lives = 3
     PLAYER.x = 0
-    PLAYER.y = 0
+    PLAYER.y = SCREENHEIGHT / 2 - PLAYER.imgHeight / 2
     PLAYER.vel = 2
 
     ENEMY = {}
     ENEMY.img = love.graphics.newImage("enemy.png")
     ENEMY.x = SCREENWIDTH - PLAYER.imgWidth
-    ENEMY.y = 0
+    ENEMY.y = SCREENHEIGHT / 2 - PLAYER.imgHeight / 2
     ENEMY.vel = 2
     ENEMY.HP = 10
 
@@ -241,211 +241,215 @@ function love.update(dt)
     end
 
     if isStarting ~= true then
+
         BALL.x = BALL.x + BALL.vel.x
         BALL.y = BALL.y + BALL.vel.y
-    end
-
-    if isShooting  then
-     
-        BULLET.x = BULLET.x + BULLET.vel
-     
-
-        if BULLET.x > SCREENWIDTH then
-            isShooting = false
-        end
     
+
+        if isShooting  then
         
-    end
-
-    if isEnemyShooting then
-       
-        ENEMYBULLET.x = ENEMYBULLET.x - ENEMYBULLET.vel
-
-        if ENEMYBULLET.x < 0 then
-          
-          isEnemyShooting = false
-          ENEMYBULLET.x = SCREENWIDTH
-        end
-      
-    end
-
-    --wall bouonce - Y irányú eltírites
-
-    if BALL.y < 0 + BALL.height then
-      
-        bounce(1, -1)
-   end
-
-   if BALL.y >= SCREENHEIGHT - BALL.height then
-
-       bounce(1, -1)
-   end
-
-   -- AI
-
-   if BALL.y < ENEMY.y + PLAYER.imgHeight / 2  then
-    ENEMY.y = ENEMY.y - ENEMY.vel
-   elseif BALL.y > ENEMY.y + PLAYER.imgHeight / 2 then
-    ENEMY.y = ENEMY.y + ENEMY.vel
-   end
-
-
-
-   --paddle bounce - X irány
-
-
-    if BALL.x < PLAYER.x + BALL.width and BALL.y >= PLAYER.y and BALL.y <= PLAYER.y + PLAYER.imgHeight then
-        bounce(-1,1)
-        BALL.x = BALL.x + 5
-    end
-
-    if BALL.x > ENEMY.x - BALL.width and BALL.y >= ENEMY.y and BALL.y <= ENEMY.y + PLAYER.imgHeight then
-        bounce(-1,1)
-        BALL.x = BALL.x - 5
-    end
-
-    if BALL.x + BALL.width < 0 or BALL.x >= (SCREENWIDTH) or BALL.y < 0 or BALL.y > SCREENHEIGHT then
-        resetBall()
-    end
-
-    if BALL.x > SCREENWIDTH then
-        PLAYER.score = PLAYER.score + 1
-        resetBall()
-    elseif BALL.x < 0 then
-        PLAYER.lives = PLAYER.lives - 1
-        resetBall()
-    end
-
-    if PLAYER.lives == 0 then
-        isGameOver = true
-    end
-
-    
-    if isShooting then
-
-       
-        if BULLET.x >= ENEMY.x and (BULLET.y < ENEMY.y + PLAYER.imgHeight and BULLET.y > ENEMY.y - PLAYER.imgHeight) then
-         
-            ENEMY.HP = ENEMY.HP - 1
-            BULLET.x = 0
-            local instance = hitSFX:play()
-            isShooting = false
+            BULLET.x = BULLET.x + BULLET.vel
         
 
-            if ENEMY.HP == 0 then
-                isGameOver = true
+            if BULLET.x > SCREENWIDTH then
+                isShooting = false
+            end
+        
+            
+        end
+
+        if isEnemyShooting then
+        
+            ENEMYBULLET.x = ENEMYBULLET.x - ENEMYBULLET.vel
+
+            if ENEMYBULLET.x < 0 then
+            
+            isEnemyShooting = false
+            ENEMYBULLET.x = SCREENWIDTH
+            end
+        
+        end
+
+        --wall bouonce - Y irányú eltírites
+
+        if BALL.y < 0 + BALL.height then
+        
+            bounce(1, -1)
+        end
+
+        if BALL.y >= SCREENHEIGHT - BALL.height then
+
+            bounce(1, -1)
+        end
+
+        -- AI
+
+        if BALL.y < ENEMY.y + PLAYER.imgHeight / 2  then
+            ENEMY.y = ENEMY.y - ENEMY.vel
+        elseif BALL.y > ENEMY.y + PLAYER.imgHeight / 2 then
+            ENEMY.y = ENEMY.y + ENEMY.vel
+        end
+
+
+
+        --paddle bounce - X irány
+
+
+        if BALL.x < PLAYER.x + BALL.width and BALL.y >= PLAYER.y and BALL.y <= PLAYER.y + PLAYER.imgHeight then
+            bounce(-1,1)
+            BALL.x = BALL.x + 5
+        end
+
+        if BALL.x > ENEMY.x - BALL.width and BALL.y >= ENEMY.y and BALL.y <= ENEMY.y + PLAYER.imgHeight then
+            bounce(-1,1)
+            BALL.x = BALL.x - 5
+        end
+
+        if BALL.x + BALL.width < 0 or BALL.x >= (SCREENWIDTH) or BALL.y < 0 or BALL.y > SCREENHEIGHT then
+            resetBall()
+        end
+
+        if BALL.x > SCREENWIDTH then
+            PLAYER.score = PLAYER.score + 1
+            resetBall()
+        elseif BALL.x < 0 then
+            PLAYER.lives = PLAYER.lives - 1
+            resetBall()
+        end
+
+        if PLAYER.lives == 0 then
+            isGameOver = true
+        end
+
+        
+        if isShooting then
+
+        
+            if BULLET.x >= ENEMY.x and (BULLET.y < ENEMY.y + PLAYER.imgHeight and BULLET.y > ENEMY.y - PLAYER.imgHeight) then
+            
+                ENEMY.HP = ENEMY.HP - 1
+                BULLET.x = 0
+                local instance = hitSFX:play()
+                isShooting = false
+            
+
+                if ENEMY.HP == 0 then
+                    isGameOver = true
+                end
             end
         end
-    end
-    
-    if ENEMY.y == PLAYER.y and isEnemyShooting == false then 
-    
-        isEnemyShooting = true
-        local y = ENEMY.y + PLAYER.imgHeight / 2
-            enemyShoot(y)
-     
-         
-    end
-
-    if isEnemyShooting then
-       
-        if ENEMYBULLET.x == 6 and (ENEMYBULLET.y < PLAYER.y + PLAYER.imgHeight and ENEMYBULLET.y > PLAYER.y) then
-            PLAYER.lives = PLAYER.lives - 1
-            local instance = hitSFX:play()
+        
+        if ENEMY.y == PLAYER.y and isEnemyShooting == false then 
+        
+            isEnemyShooting = true
+            local y = ENEMY.y + PLAYER.imgHeight / 2
+                enemyShoot(y)
+        
+            
         end
-    end
 
-    --powerup player spdup
-    
-    if (BULLET.x >= POWERUP.speedUp.x and BULLET.x <= POWERUP.speedUp.x + 32) and (BULLET.y >= POWERUP.speedUp.y and BULLET.y <= POWERUP.speedUp.y + 32) then
-    
-        powerUp("speedup")
-        BULLET.x = 0
-        isShooting = false
-        isSpeedUpOnMap = false
-       
-    end
-    
-    --powerup player spddwn
-
-    if (BULLET.x >= POWERUP.speedDown.x and BULLET.x <= POWERUP.speedDown.x + 32) and (BULLET.y >= POWERUP.speedDown.y and BULLET.y <= POWERUP.speedDown.y + 32) then
-    
-        powerUp("speeddown")
-        BULLET.x = 0
-        isShooting = false
-        isSpeedDownOnMap = false
-    end
-
-    --powerup enemy spdup
-
-    if (ENEMYBULLET.x >= POWERUP.speedUp.x and ENEMYBULLET.x <= POWERUP.speedUp.x + 32) and (ENEMYBULLET.y >= POWERUP.speedUp.y and ENEMYBULLET.y <= POWERUP.speedUp.y + 32) then
-    
-        powerUp("enemyspeedup")
-     --   ENEMYBULLET.x = SCREENWIDTH
-        isEnemyShooting = false
-        isSpeedUpOnMap = false
-       
-    end
-
-    -- powerup enemy spddwn
-
-    if (ENEMYBULLET.x >= POWERUP.speedDown.x and ENEMYBULLET.x <= POWERUP.speedDown.x + 32) and (ENEMYBULLET.y >= POWERUP.speedDown.y and ENEMYBULLET.y <= POWERUP.speedDown.y + 32) then
-    
-        powerUp("enemyspeeddown")
-    --    ENEMYBULLET.x = SCREENWIDTH
-        isEnemyShooting = false
-        isSpeedDownOnMap = false
-    end
-
-    --powerup ball spdup
-
-    if (BALL.x >= POWERUP.speedUp.x and BALL.x <= POWERUP.speedUp.x + 32) and (BALL.y >= POWERUP.speedUp.y and BALL.y <= POWERUP.speedUp.y + 32) then
-
-        powerUp("ballspeedup")
-        isSpeedUpOnMap = false
-
-    end
-
-    --powerup ball spdwn
-
-    if (BALL.x >= POWERUP.speedDown.x and BALL.x <= POWERUP.speedDown.x + 32) and (BALL.y >= POWERUP.speedDown.y and BALL.y <= POWERUP.speedDown.y + 32) then
-        powerUp("ballspeeddown")
-        isSpeedDownOnMap = false
-    end
-
-  
-
-
-    if love.keyboard.isDown("up") then 
-        if PLAYER.y > 0  then
-            PLAYER.y = PLAYER.y - PLAYER.vel
+        if isEnemyShooting then
+        
+            if ENEMYBULLET.x == 6 and (ENEMYBULLET.y < PLAYER.y + PLAYER.imgHeight and ENEMYBULLET.y > PLAYER.y) then
+                PLAYER.lives = PLAYER.lives - 1
+                local instance = hitSFX:play()
+            end
         end
-    elseif love.keyboard.isDown("down") then
-        if PLAYER.y < SCREENHEIGHT - PLAYER.imgHeight then
-            PLAYER.y = PLAYER.y + PLAYER.vel
+
+        --powerup player spdup
+        
+        if (BULLET.x >= POWERUP.speedUp.x and BULLET.x <= POWERUP.speedUp.x + 32) and (BULLET.y >= POWERUP.speedUp.y and BULLET.y <= POWERUP.speedUp.y + 32) then
+        
+            powerUp("speedup")
+            BULLET.x = 0
+            isShooting = false
+            isSpeedUpOnMap = false
+        
         end
-    elseif love.keyboard.isDown("space") then
+        
+        --powerup player spddwn
+
+        if (BULLET.x >= POWERUP.speedDown.x and BULLET.x <= POWERUP.speedDown.x + 32) and (BULLET.y >= POWERUP.speedDown.y and BULLET.y <= POWERUP.speedDown.y + 32) then
+        
+            powerUp("speeddown")
+            BULLET.x = 0
+            isShooting = false
+            isSpeedDownOnMap = false
+        end
+
+        --powerup enemy spdup
+
+        if (ENEMYBULLET.x >= POWERUP.speedUp.x and ENEMYBULLET.x <= POWERUP.speedUp.x + 32) and (ENEMYBULLET.y >= POWERUP.speedUp.y and ENEMYBULLET.y <= POWERUP.speedUp.y + 32) then
+        
+            powerUp("enemyspeedup")
+        --   ENEMYBULLET.x = SCREENWIDTH
+            isEnemyShooting = false
+            isSpeedUpOnMap = false
+        
+        end
+
+        -- powerup enemy spddwn
+
+        if (ENEMYBULLET.x >= POWERUP.speedDown.x and ENEMYBULLET.x <= POWERUP.speedDown.x + 32) and (ENEMYBULLET.y >= POWERUP.speedDown.y and ENEMYBULLET.y <= POWERUP.speedDown.y + 32) then
+        
+            powerUp("enemyspeeddown")
+        --    ENEMYBULLET.x = SCREENWIDTH
+            isEnemyShooting = false
+            isSpeedDownOnMap = false
+        end
+
+        --powerup ball spdup
+
+        if (BALL.x >= POWERUP.speedUp.x and BALL.x <= POWERUP.speedUp.x + 32) and (BALL.y >= POWERUP.speedUp.y and BALL.y <= POWERUP.speedUp.y + 32) then
+
+            powerUp("ballspeedup")
+            isSpeedUpOnMap = false
+
+        end
+
+        --powerup ball spdwn
+
+        if (BALL.x >= POWERUP.speedDown.x and BALL.x <= POWERUP.speedDown.x + 32) and (BALL.y >= POWERUP.speedDown.y and BALL.y <= POWERUP.speedDown.y + 32) then
+            powerUp("ballspeeddown")
+            isSpeedDownOnMap = false
+        end
+
+    
+
+
+        if love.keyboard.isDown("up") then 
+            if PLAYER.y > 0  then
+                PLAYER.y = PLAYER.y - PLAYER.vel
+            end
+        elseif love.keyboard.isDown("down") then
+            if PLAYER.y < SCREENHEIGHT - PLAYER.imgHeight then
+                PLAYER.y = PLAYER.y + PLAYER.vel
+            end
+    
+
+
+        elseif love.keyboard.isDown("r") then
+            resetBall()
+
+        elseif isShooting == false and love.keyboard.isDown("s") then
+            local y = PLAYER.y + PLAYER.imgHeight / 2
+            shoot(y)
+        
+        end
+
+        if love.timer.getTime() - gameStartTimer > 5 then
+            isSpeedDownOnMap = true
+            isSpeedUpOnMap = true
+            gameStartTimer = love.timer.getTime()
+        end
+
+    end
+    if love.keyboard.isDown("space") then
 
         if isStarting then
             start()
         end
-
-
-    elseif love.keyboard.isDown("r") then
-        resetBall()
-
-    elseif isShooting == false and love.keyboard.isDown("s") then
-        local y = PLAYER.y + PLAYER.imgHeight / 2
-        shoot(y)
-    
     end
-
-    if love.timer.getTime() - gameStartTimer > 5 then
-        isSpeedDownOnMap = true
-        isSpeedUpOnMap = true
-        gameStartTimer = love.timer.getTime()
-    end
-
 end
 
 function love.draw()
