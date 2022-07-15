@@ -1,3 +1,5 @@
+DEBUG = false
+
 gameStartTimer = love.timer.getTime()
 
 ripple = require('ripple')
@@ -240,7 +242,7 @@ function love.update(dt)
         t = t + dt
     end
 
-    if isStarting ~= true then
+    if isStarting ~= true and isGameOver ~= true then
 
         BALL.x = BALL.x + BALL.vel.x
         BALL.y = BALL.y + BALL.vel.y
@@ -349,8 +351,8 @@ function love.update(dt)
         end
 
         if isEnemyShooting then
-        
-            if ENEMYBULLET.x == 6 and (ENEMYBULLET.y < PLAYER.y + PLAYER.imgHeight and ENEMYBULLET.y > PLAYER.y) then
+           
+            if ENEMYBULLET.x == PLAYER.x and (ENEMYBULLET.y < PLAYER.y + PLAYER.imgHeight and ENEMYBULLET.y > PLAYER.y) then
                 PLAYER.lives = PLAYER.lives - 1
                 local instance = hitSFX:play()
             end
@@ -449,6 +451,13 @@ function love.update(dt)
         if isStarting then
             start()
         end
+        if isGameOver then
+            isGameOver = false
+            PLAYER.lives = 3
+            ENEMY.HP = 10
+            
+        end
+
     end
 end
 
