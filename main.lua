@@ -139,7 +139,7 @@ local function pickUpPowerUp()
     if (ENEMYBULLET.x >= POWERUP.speedUp.x and ENEMYBULLET.x <= POWERUP.speedUp.x + 32) and (ENEMYBULLET.y >= POWERUP.speedUp.y and ENEMYBULLET.y <= POWERUP.speedUp.y + 32) then
 
         POWERUP.enemySpeedUp.action()
-    --   ENEMYBULLET.x = SCREENWIDTH
+        ENEMYBULLET.x = SCREENWIDTH
         isEnemyShooting = false
         isSpeedUpOnMap = false
 
@@ -150,7 +150,7 @@ local function pickUpPowerUp()
     if (ENEMYBULLET.x >= POWERUP.speedDown.x and ENEMYBULLET.x <= POWERUP.speedDown.x + 32) and (ENEMYBULLET.y >= POWERUP.speedDown.y and ENEMYBULLET.y <= POWERUP.speedDown.y + 32) then
 
         POWERUP.enemySpeedDown.action()
-    --    ENEMYBULLET.x = SCREENWIDTH
+       ENEMYBULLET.x = SCREENWIDTH
         isEnemyShooting = false
         isSpeedDownOnMap = false
     end
