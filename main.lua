@@ -107,59 +107,6 @@ local function resetPowerUp(s)
     end
 end
 
-local function powerUp(whatdo)
-
-    if whatdo == "speedup" then
-        if PLAYER.vel <= 5 then
-            PLAYER.vel = PLAYER.vel + POWERUP.speedUp.modifier
-        end
-        resetPowerUp("su")
-      
-
-    elseif whatdo == "speeddown" then
-        if PLAYER.vel > 1 then
-            PLAYER.vel = PLAYER.vel + POWERUP.speedDown.modifier
-        end
-        resetPowerUp("sd")
-       
-
-    elseif whatdo == "ballspeedup" then
-        if BALL.vel.x > 0 and BALL.vel.x <= 8 then
-            BALL.vel.x = BALL.vel.x + POWERUP.speedUp.modifier
-        elseif BALL.vel.x < 0 and BALL.vel.x >= -8 then
-            BALL.vel.x = BALL.vel.x - POWERUP.speedUp.modifier
-        end
-        resetPowerUp("su")
-    
-    elseif whatdo == "ballspeeddown" then
-        if BALL.vel.x > 0 then
-            BALL.vel.x = BALL.vel.x + POWERUP.speedDown.modifier
-            if BALL.vel.x == 0 then
-                BALL.vel.x = 1
-            end
-        elseif BALL.vel.x < 0 then
-            BALL.vel.x = BALL.vel.x - POWERUP.speedDown.modifier
-            if BALL.vel.x == 0 then
-                BALL.vel.x = 1
-            end
-        end
-        resetPowerUp("sd")
-    elseif whatdo == "enemyspeedup" then
-        if ENEMY.vel <= 4 then
-            ENEMY.vel = ENEMY.vel + POWERUP.speedUp.modifier
-        end
-        resetPowerUp("su")
-    elseif whatdo == "enemyspeeddown" then
-        if ENEMY.vel > 1 then
-            ENEMY.vel = ENEMY.vel + POWERUP.speedDown.modifier
-        end
-        resetPowerUp("sd")
-    end
-
-    local instance = powerupSFX:play()
- 
-
-end
 
 function love.load()
     SCREENWIDTH = 720
@@ -217,13 +164,94 @@ function love.load()
     ENEMYBULLET.vel = 9
 
 
-    POWERUP = {}
+    POWERUP = {
+        speedUp = {
 
-    POWERUP.speedUp = {}
-    POWERUP.speedDown = {}
+            img = love.graphics.newImage("speedup.png"),
 
-    POWERUP.speedUp.img = love.graphics.newImage("speedup.png")
-    POWERUP.speedDown.img = love.graphics.newImage("speeddown.png")
+            action = function ()
+                if PLAYER.vel <= 5 then
+                    PLAYER.vel = PLAYER.vel + POWERUP.speedUp.modifier
+                end
+                resetPowerUp("su")
+            end
+ 
+        },
+
+        speedDown = {
+            img = love.graphics.newImage("speeddown.png"),
+
+            action  = function ()
+                if PLAYER.vel > 1 then
+                    PLAYER.vel = PLAYER.vel + POWERUP.speedDown.modifier
+                end
+                resetPowerUp("sd")
+            end
+
+        },
+
+        ballSpeedUp = {
+
+            action = function ()
+                if BALL.vel.x > 0 and BALL.vel.x <= 8 then
+                    BALL.vel.x = BALL.vel.x + POWERUP.speedUp.modifier
+                elseif BALL.vel.x < 0 and BALL.vel.x >= -8 then
+                    BALL.vel.x = BALL.vel.x - POWERUP.speedUp.modifier
+                end
+                resetPowerUp("su")
+                
+            end
+        },
+
+        ballSpeedDown = {
+
+            action = function ()
+                if BALL.vel.x > 0 then
+                    BALL.vel.x = BALL.vel.x + POWERUP.speedDown.modifier
+                    if BALL.vel.x == 0 then
+                        BALL.vel.x = 1
+                    end
+                elseif BALL.vel.x < 0 then
+                    BALL.vel.x = BALL.vel.x - POWERUP.speedDown.modifier
+                    if BALL.vel.x == 0 then
+                        BALL.vel.x = 1
+                    end
+                end
+                resetPowerUp("sd")
+            end
+
+        },
+
+        enemySpeedUp = {
+            action = function ()
+                if ENEMY.vel <= 4 then
+                    ENEMY.vel = ENEMY.vel + POWERUP.speedUp.modifier
+                end
+                resetPowerUp("su")
+            end
+        },
+
+        enemySpeedDown = {
+            action = function ()
+                if ENEMY.vel > 1 then
+                    ENEMY.vel = ENEMY.vel + POWERUP.speedDown.modifier
+                end
+                resetPowerUp("sd")
+                
+            end
+        },
+
+        playSFX = {
+            action = function ()
+                local instance = powerupSFX:play()
+            end
+        }
+    }
+
+    
+  
+
+   
 
     POWERUP.speedUp.x = love.math.random(50, SCREENWIDTH - 50)
     POWERUP.speedUp.y = love.math.random(10, SCREENHEIGHT - 50)
@@ -362,7 +390,7 @@ function love.update(dt)
         
         if (BULLET.x >= POWERUP.speedUp.x and BULLET.x <= POWERUP.speedUp.x + 32) and (BULLET.y >= POWERUP.speedUp.y and BULLET.y <= POWERUP.speedUp.y + 32) then
         
-            powerUp("speedup")
+            POWERUP.speedUp.action()
             BULLET.x = 0
             isShooting = false
             isSpeedUpOnMap = false
@@ -372,8 +400,8 @@ function love.update(dt)
         --powerup player spddwn
 
         if (BULLET.x >= POWERUP.speedDown.x and BULLET.x <= POWERUP.speedDown.x + 32) and (BULLET.y >= POWERUP.speedDown.y and BULLET.y <= POWERUP.speedDown.y + 32) then
-        
-            powerUp("speeddown")
+     
+            POWERUP.speedDown.action()
             BULLET.x = 0
             isShooting = false
             isSpeedDownOnMap = false
@@ -383,7 +411,7 @@ function love.update(dt)
 
         if (ENEMYBULLET.x >= POWERUP.speedUp.x and ENEMYBULLET.x <= POWERUP.speedUp.x + 32) and (ENEMYBULLET.y >= POWERUP.speedUp.y and ENEMYBULLET.y <= POWERUP.speedUp.y + 32) then
         
-            powerUp("enemyspeedup")
+            POWERUP.enemySpeedUp.action()
         --   ENEMYBULLET.x = SCREENWIDTH
             isEnemyShooting = false
             isSpeedUpOnMap = false
@@ -394,7 +422,7 @@ function love.update(dt)
 
         if (ENEMYBULLET.x >= POWERUP.speedDown.x and ENEMYBULLET.x <= POWERUP.speedDown.x + 32) and (ENEMYBULLET.y >= POWERUP.speedDown.y and ENEMYBULLET.y <= POWERUP.speedDown.y + 32) then
         
-            powerUp("enemyspeeddown")
+            POWERUP.enemySpeedDown.action()
         --    ENEMYBULLET.x = SCREENWIDTH
             isEnemyShooting = false
             isSpeedDownOnMap = false
@@ -404,7 +432,7 @@ function love.update(dt)
 
         if (BALL.x >= POWERUP.speedUp.x and BALL.x <= POWERUP.speedUp.x + 32) and (BALL.y >= POWERUP.speedUp.y and BALL.y <= POWERUP.speedUp.y + 32) then
 
-            powerUp("ballspeedup")
+            POWERUP.ballSpeedUp.action()
             isSpeedUpOnMap = false
 
         end
@@ -412,7 +440,7 @@ function love.update(dt)
         --powerup ball spdwn
 
         if (BALL.x >= POWERUP.speedDown.x and BALL.x <= POWERUP.speedDown.x + 32) and (BALL.y >= POWERUP.speedDown.y and BALL.y <= POWERUP.speedDown.y + 32) then
-            powerUp("ballspeeddown")
+            POWERUP.ballSpeedDown.action()
             isSpeedDownOnMap = false
         end
 
