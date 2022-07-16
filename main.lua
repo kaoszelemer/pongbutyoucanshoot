@@ -107,6 +107,18 @@ local function resetPowerUp(s)
     end
 end
 
+local function restart()
+    PLAYER.x = 0
+    PLAYER.y = SCREENHEIGHT / 2 - PLAYER.imgHeight / 2
+    ENEMY.x = SCREENWIDTH - PLAYER.imgWidth
+    ENEMY.y = SCREENHEIGHT / 2 - PLAYER.imgHeight / 2
+    BALL.x = SCREENWIDTH / 2
+    BALL.y = SCREENHEIGHT / 2
+    PLAYER.lives = 3
+    ENEMY.HP = 10
+    isGameOver = false
+end
+
 
 function love.load()
     SCREENWIDTH = 720
@@ -119,7 +131,10 @@ function love.load()
     love.window.setMode(SCREENWIDTH, SCREENHEIGHT)
     love.window.setTitle("Pong csak lehet loni")
 
+    bannerImage = love.graphics.newImage("banner.png")
+    
     hpImage = love.graphics.newImage("hp.png")
+
 
 
     loadSounds()
@@ -479,10 +494,12 @@ function love.update(dt)
         if isStarting then
             start()
         end
+
         if isGameOver then
-            isGameOver = false
-            PLAYER.lives = 3
-            ENEMY.HP = 10
+
+            restart()
+          
+
             
         end
 
@@ -497,7 +514,8 @@ function love.draw()
         love.graphics.translate(dx, dy)
     end
 
-    love.graphics.print("PONG CSAK LEHET LOLNI", SCREENHEIGHT / 2, 0)
+    love.graphics.draw(bannerImage, SCREENHEIGHT / 2 - bannerImage:getWidth() / 3, 0) 
+   -- love.graphics.print("PONG BUT YOU CAN SHOOT", SCREENHEIGHT / 2, 0)
    
    
  
@@ -515,6 +533,15 @@ function love.draw()
     end
     for i = 1, PLAYER.lives do 
         love.graphics.draw(hpImage, 16*i, 1)
+    end
+
+    if isGameOver then
+        love.graphics.print("PRESS SPACE TO RESTART", SCREENWIDTH / 2 - 65, SCREENHEIGHT / 4)
+    end
+
+    if isStarting then
+        love.graphics.print("PRESS SPACE TO START", SCREENWIDTH / 2 - 65, SCREENHEIGHT / 4)
+        love.graphics.print("arrows - movement, s - shoot", SCREENWIDTH / 2 - 85, SCREENHEIGHT / 4 + 20)
     end
 
     if DEBUG then
