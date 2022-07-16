@@ -99,53 +99,63 @@ function resetPowerUp(s)
     end
 end
 
-local function checkPowerUpHitbox()      
-    if (BULLET.x >= POWERUP.speedUp.x and BULLET.x <= POWERUP.speedUp.x + 32) and (BULLET.y >= POWERUP.speedUp.y and BULLET.y <= POWERUP.speedUp.y + 32) then
-        POWERUP.speedUp.pickUp("bu")    
-        POWERUP.speedUp.action()
+local function checkPowerUpHitbox() 
+    
+    local yH = POWERUP.speedUp.y + POWERUP.speedUp.img:getHeight()
+
+
+    if POWERUP.speedUp.isOnMap then
+        
+        if (BULLET.x >= POWERUP.speedUp.x) and (BULLET.y >= POWERUP.speedUp.y and BULLET.y <= yH) then
+            POWERUP.speedUp.pickUp("bu")    
+            POWERUP.speedUp.action()
+        end
+
+        if (ENEMYBULLET.x >= POWERUP.speedUp.x) and (ENEMYBULLET.y >= POWERUP.speedUp.y and ENEMYBULLET.y <= yH) then
+            POWERUP.speedUp.pickUp("en")  
+            POWERUP.enemySpeedUp.action()
+        end
+
+        if (BALL.x >= POWERUP.speedUp.x and BALL.x <= POWERUP.speedUp.x + 32) and (BALL.y >= POWERUP.speedUp.y and BALL.y <= POWERUP.speedUp.y + 32) then
+            POWERUP.speedUp.pickUp("ba")  
+            POWERUP.ballSpeedUp.action()
+        end
+
     end
 
-    if (BULLET.x >= POWERUP.speedDown.x and BULLET.x <= POWERUP.speedDown.x + 32) and (BULLET.y >= POWERUP.speedDown.y and BULLET.y <= POWERUP.speedDown.y + 32) then
-        POWERUP.speedDown.pickUp("bu")  
-        POWERUP.speedDown.action()
+    if POWERUP.speedDown.isOnMap then
+        if (BULLET.x >= POWERUP.speedDown.x) and (BULLET.y >= POWERUP.speedDown.y and BULLET.y <= yH) then
+            POWERUP.speedDown.pickUp("bu")  
+            POWERUP.speedDown.action()
+        end 
+
+        if (ENEMYBULLET.x >= POWERUP.speedDown.x) and (ENEMYBULLET.y >= POWERUP.speedDown.y and ENEMYBULLET.y <= yH) then
+            POWERUP.speedDown.pickUp("en")  
+            POWERUP.enemySpeedDown.action()
+            ENEMYBULLET.x = SCREENWIDTH
+            isEnemyShooting = false
+        end
+
+        if (BALL.x >= POWERUP.speedDown.x and BALL.x <= POWERUP.speedDown.x + 32) and (BALL.y >= POWERUP.speedDown.y and BALL.y <= POWERUP.speedDown.y + 32) then
+            POWERUP.speedDown.pickUp(ba)  
+            POWERUP.ballSpeedDown.action() 
+        end
     end
 
-    if (ENEMYBULLET.x >= POWERUP.speedUp.x and ENEMYBULLET.x <= POWERUP.speedUp.x + 32) and (ENEMYBULLET.y >= POWERUP.speedUp.y and ENEMYBULLET.y <= POWERUP.speedUp.y + 32) then
-        POWERUP.speedUp.pickUp("en")  
-        POWERUP.enemySpeedUp.action()
+    if POWERUP.double.isOnMap then
+        
+        if (BULLET.x >= POWERUP.double.x and BULLET.x <= POWERUP.double.x + 32) and (BULLET.y >= POWERUP.double.y and BULLET.y <= POWERUP.double.y + 32) then
+            POWERUP.double.action("pl")
+        end
+
+        if (ENEMYBULLET.x >= POWERUP.double.x and ENEMYBULLET.x <= POWERUP.double.x + 32) and (ENEMYBULLET.y >= POWERUP.double.y and ENEMYBULLET.y <= POWERUP.double.y + 32) then
+            POWERUP.double.action("en")
+        end
+
+        if (BALL.x >= POWERUP.double.x and BALL.x <= POWERUP.double.x + 32) and (BALL.y >= POWERUP.double.y and BALL.y <= POWERUP.double.y + 32) then
+            POWERUP.double.action("ba")
+        end
     end
-
-    if (ENEMYBULLET.x >= POWERUP.speedDown.x and ENEMYBULLET.x <= POWERUP.speedDown.x + 32) and (ENEMYBULLET.y >= POWERUP.speedDown.y and ENEMYBULLET.y <= POWERUP.speedDown.y + 32) then
-        POWERUP.speedDown.pickUp("en")  
-        POWERUP.enemySpeedDown.action()
-        ENEMYBULLET.x = SCREENWIDTH
-        isEnemyShooting = false
-    end
-
-    if (BALL.x >= POWERUP.speedUp.x and BALL.x <= POWERUP.speedUp.x + 32) and (BALL.y >= POWERUP.speedUp.y and BALL.y <= POWERUP.speedUp.y + 32) then
-        POWERUP.speedUp.pickUp("ba")  
-        POWERUP.ballSpeedUp.action()
-    end
-
-    if (BALL.x >= POWERUP.speedDown.x and BALL.x <= POWERUP.speedDown.x + 32) and (BALL.y >= POWERUP.speedDown.y and BALL.y <= POWERUP.speedDown.y + 32) then
-        POWERUP.speedDown.pickUp(ba)  
-        POWERUP.ballSpeedDown.action() 
-    end
-
-    ---- doubler
-
-    if (BULLET.x >= POWERUP.double.x and BULLET.x <= POWERUP.double.x + 32) and (BULLET.y >= POWERUP.double.y and BULLET.y <= POWERUP.double.y + 32) then
-        POWERUP.double.action("pl")
-    end
-
-    if (ENEMYBULLET.x >= POWERUP.double.x and ENEMYBULLET.x <= POWERUP.double.x + 32) and (ENEMYBULLET.y >= POWERUP.double.y and ENEMYBULLET.y <= POWERUP.double.y + 32) then
-        POWERUP.double.action("en")
-    end
-
-    if (BALL.x >= POWERUP.double.x and BALL.x <= POWERUP.double.x + 32) and (BALL.y >= POWERUP.double.y and BALL.y <= POWERUP.double.y + 32) then
-        POWERUP.double.action("ba")
-    end
-
 
 end
 
@@ -330,7 +340,6 @@ function love.update(dt)
         if PLAYER.lives == 0 then
             isGameOver = true
         end
-
         
         if isShooting then
 
@@ -366,12 +375,9 @@ function love.update(dt)
             end
         end
 
-
         checkPowerUpHitbox()
-      
 
         -- billentyuzet
-
 
         if love.keyboard.isDown("up") then 
             if PLAYER.y > 0  then
@@ -381,20 +387,12 @@ function love.update(dt)
             if PLAYER.y < SCREENHEIGHT - PLAYER.imgHeight then
                 PLAYER.y = PLAYER.y + PLAYER.vel
             end
-    
-
-
         elseif love.keyboard.isDown("r") then
             resetBall()
-
         elseif isShooting == false and love.keyboard.isDown("s") then
             local y = PLAYER.y + PLAYER.imgHeight / 2
-            shoot(y)
-        
+            shoot(y)      
         end
-
-
-
 
         -- timerek
 
@@ -415,20 +413,15 @@ function love.update(dt)
       
 
     end
-    if love.keyboard.isDown("space") then
 
+    if love.keyboard.isDown("space") then
         if isStarting then
             start()
         end
 
         if isGameOver then
-
             restart(false)
-          
-
-            
         end
-
     end
 end
 
@@ -442,11 +435,7 @@ function love.draw()
 
     love.graphics.draw(bannerImage, SCREENHEIGHT / 2 - bannerImage:getWidth() / 3, 0) 
    -- love.graphics.print("PONG BUT YOU CAN SHOOT", SCREENHEIGHT / 2, 0)
-   
-   
- 
-    
-    
+
     love.graphics.draw(PLAYER.img, PLAYER.x, PLAYER.y )
   
     love.graphics.draw(BALL.img, BALL.x, BALL.y)
