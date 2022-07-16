@@ -1,5 +1,8 @@
 DEBUG = false
 
+SCREENWIDTH = 720
+SCREENHEIGHT = 520
+
 gameStartTimer = love.timer.getTime()
 
 ripple = require('ripple')
@@ -72,8 +75,6 @@ local function start()
 
 end
 
-
-
 local function bounce(x, y)
     startShake(0.1,1)
     BALL.vel.x = x * BALL.vel.x
@@ -98,68 +99,39 @@ function resetPowerUp(s)
     end
 end
 
-local function pickUpPowerUp()
-    --powerup player spdup
-            
+local function checkPowerUpHitbox()      
     if (BULLET.x >= POWERUP.speedUp.x and BULLET.x <= POWERUP.speedUp.x + 32) and (BULLET.y >= POWERUP.speedUp.y and BULLET.y <= POWERUP.speedUp.y + 32) then
-            
+        POWERUP.speedUp.pickUp("bu")    
         POWERUP.speedUp.action()
-        BULLET.x = 0
-        isShooting = false
-        isSpeedUpOnMap = false
-
     end
-
-    --powerup player spddwn
 
     if (BULLET.x >= POWERUP.speedDown.x and BULLET.x <= POWERUP.speedDown.x + 32) and (BULLET.y >= POWERUP.speedDown.y and BULLET.y <= POWERUP.speedDown.y + 32) then
-
+        POWERUP.speedDown.pickUp("bu")  
         POWERUP.speedDown.action()
-        BULLET.x = 0
-        isShooting = false
-        isSpeedDownOnMap = false
     end
-
-    --powerup enemy spdup
 
     if (ENEMYBULLET.x >= POWERUP.speedUp.x and ENEMYBULLET.x <= POWERUP.speedUp.x + 32) and (ENEMYBULLET.y >= POWERUP.speedUp.y and ENEMYBULLET.y <= POWERUP.speedUp.y + 32) then
-
+        POWERUP.speedUp.pickUp("en")  
         POWERUP.enemySpeedUp.action()
-        ENEMYBULLET.x = SCREENWIDTH
-        isEnemyShooting = false
-        isSpeedUpOnMap = false
-
     end
-
-    -- powerup enemy spddwn
 
     if (ENEMYBULLET.x >= POWERUP.speedDown.x and ENEMYBULLET.x <= POWERUP.speedDown.x + 32) and (ENEMYBULLET.y >= POWERUP.speedDown.y and ENEMYBULLET.y <= POWERUP.speedDown.y + 32) then
-
+        POWERUP.speedDown.pickUp("en")  
         POWERUP.enemySpeedDown.action()
-       ENEMYBULLET.x = SCREENWIDTH
+        ENEMYBULLET.x = SCREENWIDTH
         isEnemyShooting = false
-        isSpeedDownOnMap = false
     end
-
-    --powerup ball spdup
 
     if (BALL.x >= POWERUP.speedUp.x and BALL.x <= POWERUP.speedUp.x + 32) and (BALL.y >= POWERUP.speedUp.y and BALL.y <= POWERUP.speedUp.y + 32) then
-
+        POWERUP.speedUp.pickUp("ba")  
         POWERUP.ballSpeedUp.action()
-        isSpeedUpOnMap = false
-
     end
-
-    --powerup ball spdwn
 
     if (BALL.x >= POWERUP.speedDown.x and BALL.x <= POWERUP.speedDown.x + 32) and (BALL.y >= POWERUP.speedDown.y and BALL.y <= POWERUP.speedDown.y + 32) then
-        POWERUP.ballSpeedDown.action()
-        isSpeedDownOnMap = false
+        POWERUP.speedDown.pickUp(ba)  
+        POWERUP.ballSpeedDown.action() 
     end
-
 end
-
-
 
 local function restart(b)
 
@@ -185,10 +157,7 @@ local function restart(b)
     end
 end
 
-
 function love.load()
-    SCREENWIDTH = 720
-    SCREENHEIGHT = 520
 
     isStarting = true
     isShooting = false
@@ -199,8 +168,6 @@ function love.load()
 
     bannerImage = love.graphics.newImage("banner.png")
     hpImage = love.graphics.newImage("hp.png")
-
-
 
     loadSounds()
 
@@ -243,16 +210,9 @@ function love.load()
     ENEMYBULLET.y = ENEMY.y + PLAYER.imgHeight / 2
     ENEMYBULLET.vel = 9
 
-    POWERUP.speedUp.x = love.math.random(50, SCREENWIDTH - 50)
-    POWERUP.speedUp.y = love.math.random(10, SCREENHEIGHT - 50)
-    
-    POWERUP.speedDown.x = love.math.random(50, SCREENWIDTH - 50)
-    POWERUP.speedDown.y = love.math.random(10, SCREENHEIGHT - 50)
-    
     POWERUP.speedUp.modifier = 1
     POWERUP.speedDown.modifier = -1
    
-
 end
 
 function love.update(dt)
@@ -311,10 +271,7 @@ function love.update(dt)
             ENEMY.y = ENEMY.y + ENEMY.vel
         end
 
-
-
         --paddle bounce - X irány
-
 
         if BALL.x < PLAYER.x + BALL.width and BALL.y >= PLAYER.y and BALL.y <= PLAYER.y + PLAYER.imgHeight then
             bounce(-1,1)
@@ -326,10 +283,6 @@ function love.update(dt)
             BALL.x = BALL.x - 5
         end
 
-      --[[   if BALL.x + BALL.width < 0 or BALL.x >= (SCREENWIDTH) or BALL.y < 0 or BALL.y > SCREENHEIGHT then
-            resetBall()
-        end
- ]]
         --goal
 
         if BALL.x > SCREENWIDTH - 5 then
@@ -382,10 +335,10 @@ function love.update(dt)
         end
 
 
-        pickUpPowerUp()
+        checkPowerUpHitbox()
       
 
-    
+        -- billentyuzet
 
 
         if love.keyboard.isDown("up") then 
@@ -408,11 +361,26 @@ function love.update(dt)
         
         end
 
-        if love.timer.getTime() - gameStartTimer > 5 then
-            isSpeedDownOnMap = true
-            isSpeedUpOnMap = true
-            gameStartTimer = love.timer.getTime()
+
+
+
+        -- timerek
+
+
+        if love.timer.getTime() - POWERUP.speedUp.timer > POWERUP.speedUp.dur then
+            POWERUP.speedUp.isOnMap = true
+            
         end
+
+        if love.timer.getTime() - POWERUP.speedDown.timer > POWERUP.speedDown.dur then
+            POWERUP.speedDown.isOnMap = true
+        end
+
+        if love.timer.getTime() - POWERUP.double.timer > POWERUP.double.dur then
+            POWERUP.double.isOnMap = true
+        end
+
+      
 
     end
     if love.keyboard.isDown("space") then
@@ -494,12 +462,16 @@ function love.draw()
         love.graphics.draw(ENEMYBULLET.img, ENEMYBULLET.x, ENEMYBULLET.y, math.pi)
     end
 
-    if isSpeedDownOnMap then
+    if POWERUP.speedDown.isOnMap then
         love.graphics.draw(POWERUP.speedDown.img, POWERUP.speedDown.x, POWERUP.speedDown.y, 0, 2, 2)
     end
 
-    if isSpeedUpOnMap then
+    if POWERUP.speedUp.isOnMap then
         love.graphics.draw(POWERUP.speedUp.img, POWERUP.speedUp.x, POWERUP.speedUp.y, 0, 2, 2)
+    end
+  --  
+    if POWERUP.double.isOnMap then
+        love.graphics.draw(POWERUP.double.img, POWERUP.double.x, POWERUP.double.y)
     end
 
 end

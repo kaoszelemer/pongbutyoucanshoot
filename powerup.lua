@@ -1,7 +1,29 @@
 POWERUP = {
+
+ 
+
     speedUp = {
 
+        pickUp = function (who)
+                     
+            if who == "bu" then
+                BULLET.x = 0
+                isShooting = false
+            elseif who == "en" then
+                ENEMYBULLET.x = SCREENWIDTH
+                isEnemyShooting = false
+            elseif who == "ba" then    
+            
+            end
+            POWERUP.speedUp.isOnMap = false
+        end,
+
         img = love.graphics.newImage("speedup.png"),
+        x = love.math.random(50, SCREENWIDTH - 50),
+        y = love.math.random(50, SCREENHEIGHT - 50),
+        dur = 5,
+        timer = love.timer.getTime(),
+        isOnMap = false,
 
         action = function ()
             if PLAYER.vel <= 6 then
@@ -13,7 +35,28 @@ POWERUP = {
     },
 
     speedDown = {
+
+        pickUp = function (who)
+            if who == "bu" then
+                BULLET.x = 0
+                isShooting = false
+            elseif who == "en" then
+                ENEMYBULLET.x = SCREENWIDTH
+                isEnemyShooting = false
+            elseif who == "ba" then    
+            
+            end
+           
+            POWERUP.speedDown.isOnMap = false
+           
+        end,
+
         img = love.graphics.newImage("speeddown.png"),
+        x = love.math.random(50, SCREENWIDTH - 50),
+        y = love.math.random(50, SCREENHEIGHT - 50),
+        dur = 5,
+        timer = love.timer.getTime(),
+        isOnMap = false,
 
         action  = function ()
             if PLAYER.vel > 2 then
@@ -79,14 +122,24 @@ POWERUP = {
         action = function ()
             local instance = powerupSFX:play()
         end
+    },
+
+    double = {
+
+        img = love.graphics.newImage('double.png'),
+        x = love.math.random(50, SCREENWIDTH - 50),
+        y = love.math.random(50, SCREENHEIGHT - 50),
+        dur = 5,
+        timer = love.timer.getTime(),
+        isOnMap = false,
+
+        action = function()
+            
+            print("double")
+
+        end
     }
 }
-
-
-
-
-
-
 
 
 return POWERUP
