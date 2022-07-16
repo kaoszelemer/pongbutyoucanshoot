@@ -4,7 +4,7 @@ POWERUP = {
         img = love.graphics.newImage("speedup.png"),
 
         action = function ()
-            if PLAYER.vel <= 5 then
+            if PLAYER.vel <= 6 then
                 PLAYER.vel = PLAYER.vel + POWERUP.speedUp.modifier
             end
             resetPowerUp("su")
@@ -16,7 +16,7 @@ POWERUP = {
         img = love.graphics.newImage("speeddown.png"),
 
         action  = function ()
-            if PLAYER.vel > 1 then
+            if PLAYER.vel > 2 then
                 PLAYER.vel = PLAYER.vel + POWERUP.speedDown.modifier
             end
             resetPowerUp("sd")
@@ -58,7 +58,7 @@ POWERUP = {
 
     enemySpeedUp = {
         action = function ()
-            if ENEMY.vel <= 4 then
+            if ENEMY.vel <= 6 then
                 ENEMY.vel = ENEMY.vel + POWERUP.speedUp.modifier
             end
             resetPowerUp("su")
@@ -67,7 +67,7 @@ POWERUP = {
 
     enemySpeedDown = {
         action = function ()
-            if ENEMY.vel > 1 then
+            if ENEMY.vel > 2 then
                 ENEMY.vel = ENEMY.vel + POWERUP.speedDown.modifier
             end
             resetPowerUp("sd")

@@ -67,26 +67,12 @@ local function start()
     end
         
 
-    BALL.vel.x = 2*a
-    BALL.vel.y = 2*a
-
-    if BALL.vel.x == 0 then
-        BALL.vel.x = 2
-    end
-    if BALL.vel.y == 0 then
-        BALL.vel.y = 2
-    end
+    BALL.vel.x = 4*a
+    BALL.vel.y = 4*a
 
 end
 
-local function resetBall()
-   
-    if isGameOver ~= true then
-        isStarting = true
-        BALL.x = SCREENWIDTH / 2
-        BALL.y = SCREENHEIGHT / 2
-    end
-end
+
 
 local function bounce(x, y)
     startShake(0.1,1)
@@ -173,16 +159,30 @@ local function pickUpPowerUp()
 
 end
 
-local function restart()
+
+
+local function restart(b)
+
     PLAYER.x = 0
     PLAYER.y = SCREENHEIGHT / 2 - PLAYER.imgHeight / 2
     ENEMY.x = SCREENWIDTH - PLAYER.imgWidth
     ENEMY.y = SCREENHEIGHT / 2 - PLAYER.imgHeight / 2
     BALL.x = SCREENWIDTH / 2
     BALL.y = SCREENHEIGHT / 2
-    PLAYER.lives = 3
-    ENEMY.HP = 10
-    isGameOver = false
+    PLAYER.vel = 3
+    ENEMY.vel = 3
+    BALL.vel.x = 4
+
+    if b then
+        isStarting = true
+        return
+    end
+
+    if b == false then
+        PLAYER.lives = 3
+        ENEMY.HP = 10
+        isGameOver = false
+    end
 end
 
 
@@ -212,13 +212,13 @@ function love.load()
     PLAYER.lives = 3
     PLAYER.x = 0
     PLAYER.y = SCREENHEIGHT / 2 - PLAYER.imgHeight / 2
-    PLAYER.vel = 2
+    PLAYER.vel = 3
 
     ENEMY = {}
     ENEMY.img = love.graphics.newImage("enemy.png")
     ENEMY.x = SCREENWIDTH - PLAYER.imgWidth
     ENEMY.y = SCREENHEIGHT / 2 - PLAYER.imgHeight / 2
-    ENEMY.vel = 2
+    ENEMY.vel = 3
     ENEMY.HP = 10
 
     BALL = {}
@@ -326,18 +326,20 @@ function love.update(dt)
             BALL.x = BALL.x - 5
         end
 
-        if BALL.x + BALL.width < 0 or BALL.x >= (SCREENWIDTH) or BALL.y < 0 or BALL.y > SCREENHEIGHT then
+      --[[   if BALL.x + BALL.width < 0 or BALL.x >= (SCREENWIDTH) or BALL.y < 0 or BALL.y > SCREENHEIGHT then
             resetBall()
         end
+ ]]
+        --goal
 
-        if BALL.x > SCREENWIDTH then
+        if BALL.x > SCREENWIDTH - 5 then
             local instance = goalSFX:play()
-            PLAYER.score = PLAYER.score + 1
-            resetBall()
+            ENEMY.HP = ENEMY.HP - 2
+            restart(true)
         elseif BALL.x < 0 then
             local instance = goalSFX:play()
             PLAYER.lives = PLAYER.lives - 1
-            resetBall()
+            restart(true)
         end
 
         if PLAYER.lives == 0 then
@@ -348,7 +350,7 @@ function love.update(dt)
         if isShooting then
 
         
-            if BULLET.x >= ENEMY.x and (BULLET.y < ENEMY.y + PLAYER.imgHeight and BULLET.y > ENEMY.y - PLAYER.imgHeight) then
+            if BULLET.x >= ENEMY.x and (BULLET.y < ENEMY.y + PLAYER.imgHeight and BULLET.y > ENEMY.y) then
             
                 ENEMY.HP = ENEMY.HP - 1
                 BULLET.x = 0
@@ -421,7 +423,7 @@ function love.update(dt)
 
         if isGameOver then
 
-            restart()
+            restart(false)
           
 
             
@@ -463,7 +465,7 @@ function love.draw()
         love.graphics.print("PRESS SPACE TO RESTART", SCREENWIDTH / 2 - 65, SCREENHEIGHT / 4)
     end
 
-    if isStarting then
+    if isStarting and PLAYER.lives > 0 then
         love.graphics.print("PRESS SPACE TO START", SCREENWIDTH / 2 - 65, SCREENHEIGHT / 4)
         love.graphics.print("arrows - movement, s - shoot", SCREENWIDTH / 2 - 85, SCREENHEIGHT / 4 + 20)
     end
