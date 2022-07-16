@@ -118,7 +118,7 @@ local function checkPowerUpHitbox()
         end
 
         if ((BALL.x >= POWERUP.speedUp.x + POWERUP.speedUp.img:getWidth()) or
-            (BALL.x + BALL.width <= POWERUP.speedDown.x) or
+            (BALL.x + BALL.width <= POWERUP.speedUp.x) or
             (BALL.y >= POWERUP.speedUp.y + POWERUP.speedUp.img:getHeight()) or
              (BALL.y + BALL.height <= POWERUP.speedUp.y)) then
         return
