@@ -131,6 +131,22 @@ local function checkPowerUpHitbox()
         POWERUP.speedDown.pickUp(ba)  
         POWERUP.ballSpeedDown.action() 
     end
+
+    ---- doubler
+
+    if (BULLET.x >= POWERUP.double.x and BULLET.x <= POWERUP.double.x + 32) and (BULLET.y >= POWERUP.double.y and BULLET.y <= POWERUP.double.y + 32) then
+        POWERUP.double.action("pl")
+    end
+
+    if (ENEMYBULLET.x >= POWERUP.double.x and ENEMYBULLET.x <= POWERUP.double.x + 32) and (ENEMYBULLET.y >= POWERUP.double.y and ENEMYBULLET.y <= POWERUP.double.y + 32) then
+        POWERUP.double.action("en")
+    end
+
+    if (BALL.x >= POWERUP.double.x and BALL.x <= POWERUP.double.x + 32) and (BALL.y >= POWERUP.double.y and BALL.y <= POWERUP.double.y + 32) then
+        POWERUP.double.action("ba")
+    end
+
+
 end
 
 local function restart(b)
@@ -159,12 +175,21 @@ end
 
 function love.load()
 
+
+
     isStarting = true
     isShooting = false
     isEnemyShooting = false
 
     love.window.setMode(SCREENWIDTH, SCREENHEIGHT)
     love.window.setTitle("Pong csak lehet loni")
+    COLORS = {
+
+        bg = {34 / 255, 6 / 255, 48 / 255}
+
+    }
+
+    love.graphics.setBackgroundColor(COLORS.bg)
 
     bannerImage = love.graphics.newImage("banner.png")
     hpImage = love.graphics.newImage("hp.png")
@@ -180,6 +205,7 @@ function love.load()
     PLAYER.x = 0
     PLAYER.y = SCREENHEIGHT / 2 - PLAYER.imgHeight / 2
     PLAYER.vel = 3
+    PLAYER.doubleShoot = false
 
     ENEMY = {}
     ENEMY.img = love.graphics.newImage("enemy.png")
@@ -187,6 +213,7 @@ function love.load()
     ENEMY.y = SCREENHEIGHT / 2 - PLAYER.imgHeight / 2
     ENEMY.vel = 3
     ENEMY.HP = 10
+    ENEMY.doubleShoot = false
 
     BALL = {}
     BALL.img = love.graphics.newImage("ball.png")
@@ -197,12 +224,15 @@ function love.load()
     BALL.vel.y = 1
     BALL.height = BALL.img:getHeight()
     BALL.width = BALL.img:getWidth()
+    BALL.doubleball = false
 
     BULLET = {}
     BULLET.img = love.graphics.newImage("bullet.png")
     BULLET.x = 0
     BULLET.y = PLAYER.y + PLAYER.imgHeight / 2
     BULLET.vel = 10
+
+
 
     ENEMYBULLET = {}
     ENEMYBULLET.img = love.graphics.newImage("bullet.png")
@@ -235,6 +265,8 @@ function love.update(dt)
             if BULLET.x > SCREENWIDTH then
                 isShooting = false
             end
+
+        
         
             
         end
@@ -463,11 +495,11 @@ function love.draw()
     end
 
     if POWERUP.speedDown.isOnMap then
-        love.graphics.draw(POWERUP.speedDown.img, POWERUP.speedDown.x, POWERUP.speedDown.y, 0, 2, 2)
+        love.graphics.draw(POWERUP.speedDown.img, POWERUP.speedDown.x, POWERUP.speedDown.y)
     end
 
     if POWERUP.speedUp.isOnMap then
-        love.graphics.draw(POWERUP.speedUp.img, POWERUP.speedUp.x, POWERUP.speedUp.y, 0, 2, 2)
+        love.graphics.draw(POWERUP.speedUp.img, POWERUP.speedUp.x, POWERUP.speedUp.y)
     end
   --  
     if POWERUP.double.isOnMap then

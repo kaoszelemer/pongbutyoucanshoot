@@ -133,10 +133,17 @@ POWERUP = {
         timer = love.timer.getTime(),
         isOnMap = false,
 
-        action = function()
+        action = function(who)
             
-            print("double")
-
+            if who == "pl" then
+                PLAYER.doubleShoot = true
+            elseif who == "en" then
+                ENEMY.doubleShoot = true
+            elseif who == "ball" then
+                BALL.doubleball = true
+            end
+            
+            
         end
     }
 }
