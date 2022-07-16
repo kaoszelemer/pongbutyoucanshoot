@@ -29,6 +29,9 @@ local function loadSounds()
     local shootsrc = love.audio.newSource('shoot.wav', 'static')
     shootSFX = ripple.newSound(shootsrc)
 
+    local goalsrc = love.audio.newSource('goal.wav', 'static')
+    goalSFX = ripple.newSound(goalsrc)
+
 
 
 end
@@ -77,6 +80,7 @@ local function start()
 end
 
 local function resetBall()
+   
     if isGameOver ~= true then
         isStarting = true
         BALL.x = SCREENWIDTH / 2
@@ -327,9 +331,11 @@ function love.update(dt)
         end
 
         if BALL.x > SCREENWIDTH then
+            local instance = goalSFX:play()
             PLAYER.score = PLAYER.score + 1
             resetBall()
         elseif BALL.x < 0 then
+            local instance = goalSFX:play()
             PLAYER.lives = PLAYER.lives - 1
             resetBall()
         end
