@@ -102,7 +102,8 @@ end
 local function checkPowerUpHitbox() 
     
     local yH = POWERUP.speedUp.y + POWERUP.speedUp.img:getHeight()
-
+    local bx = BALL.x + BALL.width
+    local by = BALL.y + BALL.height
 
     if POWERUP.speedUp.isOnMap then
         
@@ -116,7 +117,12 @@ local function checkPowerUpHitbox()
             POWERUP.enemySpeedUp.action()
         end
 
-        if (BALL.x >= POWERUP.speedUp.x and BALL.x <= POWERUP.speedUp.x + 32) and (BALL.y >= POWERUP.speedUp.y and BALL.y <= POWERUP.speedUp.y + 32) then
+        if ((BALL.x >= POWERUP.speedUp.x + POWERUP.speedUp.img:getWidth()) or
+            (BALL.x + BALL.width <= POWERUP.speedDown.x) or
+            (BALL.y >= POWERUP.speedUp.y + POWERUP.speedUp.img:getHeight()) or
+             (BALL.y + BALL.height <= POWERUP.speedUp.y)) then
+        return
+        else
             POWERUP.speedUp.pickUp("ba")  
             POWERUP.ballSpeedUp.action()
         end
@@ -136,7 +142,12 @@ local function checkPowerUpHitbox()
             isEnemyShooting = false
         end
 
-        if (BALL.x >= POWERUP.speedDown.x and BALL.x <= POWERUP.speedDown.x + 32) and (BALL.y >= POWERUP.speedDown.y and BALL.y <= POWERUP.speedDown.y + 32) then
+        if ((BALL.x >= POWERUP.speedDown.x + POWERUP.speedDown.img:getWidth()) or
+        (BALL.x + BALL.width <= POWERUP.speedDown.x) or
+        (BALL.y >= POWERUP.speedDown.y + POWERUP.speedDown.img:getHeight()) or
+         (BALL.y + BALL.height <= POWERUP.speedDown.y)) then
+        return
+         else
             POWERUP.speedDown.pickUp(ba)  
             POWERUP.ballSpeedDown.action() 
         end
@@ -144,17 +155,29 @@ local function checkPowerUpHitbox()
 
     if POWERUP.double.isOnMap then
         
-        if (BULLET.x >= POWERUP.double.x and BULLET.x <= POWERUP.double.x + 32) and (BULLET.y >= POWERUP.double.y and BULLET.y <= POWERUP.double.y + 32) then
-            POWERUP.double.action("pl")
+        if PLAYER.doubleShoot ~= true then
+            if (BULLET.x >= POWERUP.double.x) and (BULLET.y >= POWERUP.double.y and BULLET.y <= yH) then
+                POWERUP.double.action("pl")
+            end
         end
 
-        if (ENEMYBULLET.x >= POWERUP.double.x and ENEMYBULLET.x <= POWERUP.double.x + 32) and (ENEMYBULLET.y >= POWERUP.double.y and ENEMYBULLET.y <= POWERUP.double.y + 32) then
-            POWERUP.double.action("en")
+        if ENEMY.doubleShoot ~= true then
+            if (ENEMYBULLET.x >= POWERUP.double.x) and (ENEMYBULLET.y >= POWERUP.double.y and ENEMYBULLET.y <= yH) then
+                POWERUP.double.action("en")
+            end
         end
 
-        if (BALL.x >= POWERUP.double.x and BALL.x <= POWERUP.double.x + 32) and (BALL.y >= POWERUP.double.y and BALL.y <= POWERUP.double.y + 32) then
-            POWERUP.double.action("ba")
+        if BALL.doubleball ~= true then
+            if ((BALL.x >= POWERUP.double.x + POWERUP.double.img:getWidth()) or
+            (BALL.x + BALL.width <= POWERUP.double.x) or
+            (BALL.y >= POWERUP.double.y + POWERUP.double.img:getHeight()) or
+             (BALL.y + BALL.height <= POWERUP.double.y)) then
+            return
+            else
+                POWERUP.double.action("ba")
+            end
         end
+
     end
 
 end
@@ -281,6 +304,8 @@ function love.update(dt)
             
         end
 
+
+
         if isEnemyShooting then
         
             ENEMYBULLET.x = ENEMYBULLET.x - ENEMYBULLET.vel
@@ -315,14 +340,14 @@ function love.update(dt)
 
         --paddle bounce - X irány
 
-        if BALL.x < PLAYER.x + BALL.width and BALL.y >= PLAYER.y and BALL.y <= PLAYER.y + PLAYER.imgHeight then
+        if BALL.x < PLAYER.x + PLAYER.imgWidth - BALL.width / 2 and BALL.y >= PLAYER.y and BALL.y <= PLAYER.y + PLAYER.imgHeight then
             bounce(-1,1)
-            BALL.x = BALL.x + 5
+            BALL.x = BALL.x + BALL.width / 2
         end
 
-        if BALL.x > ENEMY.x - BALL.width and BALL.y >= ENEMY.y and BALL.y <= ENEMY.y + PLAYER.imgHeight then
+        if BALL.x > ENEMY.x - BALL.width / 2 and BALL.y >= ENEMY.y and BALL.y <= ENEMY.y + PLAYER.imgHeight then
             bounce(-1,1)
-            BALL.x = BALL.x - 5
+            BALL.x = BALL.x - BALL.width / 2
         end
 
         --goal
@@ -397,16 +422,16 @@ function love.update(dt)
         -- timerek
 
 
-        if love.timer.getTime() - POWERUP.speedUp.timer > POWERUP.speedUp.dur then
+        if POWERUP.speedUp.isOnMap ~= true and love.timer.getTime() - POWERUP.speedUp.timer > POWERUP.speedUp.dur then
             POWERUP.speedUp.isOnMap = true
             
         end
 
-        if love.timer.getTime() - POWERUP.speedDown.timer > POWERUP.speedDown.dur then
+        if POWERUP.speedDown.isOnMap ~= true and love.timer.getTime() - POWERUP.speedDown.timer > POWERUP.speedDown.dur then
             POWERUP.speedDown.isOnMap = true
         end
 
-        if love.timer.getTime() - POWERUP.double.timer > POWERUP.double.dur then
+        if POWERUP.double.isOnMap ~= true and love.timer.getTime() - POWERUP.double.timer > POWERUP.double.dur then
             POWERUP.double.isOnMap = true
         end
 
