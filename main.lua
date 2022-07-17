@@ -526,7 +526,8 @@ function love.update(dt)
                 local instance = goalSFX:play()
                 ENEMY.HP = ENEMY.HP - 2
                 restart(true)
-            elseif BALL2.x < 0 then
+                return
+            elseif BALL2.x < PLAYER.x then
                 local instance = goalSFX:play()
                 PLAYER.lives = PLAYER.lives - 1
                 restart(true)
@@ -537,13 +538,14 @@ function love.update(dt)
             local instance = goalSFX:play()
             ENEMY.HP = ENEMY.HP - 2
             restart(true)
-        elseif BALL.x < 0 then
+            return
+        elseif BALL.x < PLAYER.x then
             local instance = goalSFX:play()
             PLAYER.lives = PLAYER.lives - 1
             restart(true)
         end
 
-        if PLAYER.lives == 0 then
+        if PLAYER.lives <= 0 then
             isGameOver = true
         end
         
