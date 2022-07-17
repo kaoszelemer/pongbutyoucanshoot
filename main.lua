@@ -15,6 +15,13 @@ local function startShake(duration, magnitude)
     t, shakeDuration, shakeMagnitude = 0, duration or 1, magnitude or 5
 end
 
+local function checkCollision(x1,y1,w1,h1, x2,y2,w2,h2)
+    return x1 < x2+w2 and
+           x2 < x1+w1 and
+           y1 < y2+h2 and
+           y2 < y1+h1
+end
+
 local function loadSounds()
 
     local pongsrc = love.audio.newSource('pong.wav', 'static')
@@ -117,15 +124,13 @@ local function checkPowerUpHitbox()
             POWERUP.enemySpeedUp.action()
         end
 
-        if ((BALL.x >= POWERUP.speedUp.x + POWERUP.speedUp.img:getWidth()) or
-            (BALL.x + BALL.width <= POWERUP.speedUp.x) or
-            (BALL.y >= POWERUP.speedUp.y + POWERUP.speedUp.img:getHeight()) or
-             (BALL.y + BALL.height <= POWERUP.speedUp.y)) then
-        return
-        else
+        local ballCol = checkCollision(BALL.x, BALL.y, BALL.width, BALL.height, POWERUP.speedUp.x, POWERUP.speedUp.y, POWERUP.speedUp.img:getWidth(), POWERUP.speedUp.img:getHeight())
+
+        if ballCol then
             POWERUP.speedUp.pickUp("ba")  
-            POWERUP.ballSpeedUp.action()
+            POWERUP.ballSpeedUp.action() 
         end
+ 
 
     end
 
@@ -142,15 +147,14 @@ local function checkPowerUpHitbox()
             isEnemyShooting = false
         end
 
-        if ((BALL.x >= POWERUP.speedDown.x + POWERUP.speedDown.img:getWidth()) or
-        (BALL.x + BALL.width <= POWERUP.speedDown.x) or
-        (BALL.y >= POWERUP.speedDown.y + POWERUP.speedDown.img:getHeight()) or
-         (BALL.y + BALL.height <= POWERUP.speedDown.y)) then
-        return
-         else
-            POWERUP.speedDown.pickUp(ba)  
+        local ballCol = checkCollision(BALL.x, BALL.y, BALL.width, BALL.height, POWERUP.speedDown.x, POWERUP.speedDown.y, POWERUP.speedDown.img:getWidth(), POWERUP.speedDown.img:getHeight())
+    
+        if ballCol then 
+            POWERUP.speedDown.pickUp("ba")  
             POWERUP.ballSpeedDown.action() 
         end
+
+        
     end
 
     if POWERUP.double.isOnMap then
@@ -167,16 +171,13 @@ local function checkPowerUpHitbox()
             end
         end
 
-        if BALL.doubleball ~= true then
-            if ((BALL.x >= POWERUP.double.x + POWERUP.double.img:getWidth()) or
-            (BALL.x + BALL.width <= POWERUP.double.x) or
-            (BALL.y >= POWERUP.double.y + POWERUP.double.img:getHeight()) or
-             (BALL.y + BALL.height <= POWERUP.double.y)) then
-            return
-            else
-                POWERUP.double.action("ba")
-            end
-        end
+    
+    local ballCol = checkCollision(BALL.x, BALL.y, BALL.width, BALL.height, POWERUP.double.x, POWERUP.double.y, POWERUP.double.img:getWidth(), POWERUP.double.img:getHeight())
+
+    if ballCol then
+    --    POWERUP.double.pickUp("ba")  
+     --   POWERUP.ballSpeedUp.action() 
+    end
 
     end
 
