@@ -54,6 +54,7 @@ local function shoot(y)
 
     isShooting = true
 
+    BULLET.x = BULLET.x + PLAYER.imgWidth
     BULLET.y = y
 
     if BULLET.x > SCREENWIDTH then
@@ -398,7 +399,7 @@ function love.load()
 
     ENEMYBULLET = {}
     ENEMYBULLET.img = love.graphics.newImage("bullet.png")
-    ENEMYBULLET.x = SCREENWIDTH
+    ENEMYBULLET.x = SCREENWIDTH - PLAYER.imgWidth
     ENEMYBULLET.y = ENEMY.y + PLAYER.imgHeight / 2
     ENEMYBULLET.vel = 9
     ENEMYBULLET.width = ENEMYBULLET.img:getWidth()
