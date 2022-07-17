@@ -319,7 +319,7 @@ function love.load()
     love.window.setTitle("Pong csak lehet loni")
     COLORS = {
 
-        bg = {34 / 255, 6 / 255, 48 / 255}
+        bg = {43 / 255, 15 / 255, 84 / 255}
 
     }
 
