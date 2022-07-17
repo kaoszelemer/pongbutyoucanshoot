@@ -42,7 +42,11 @@ local function loadSounds()
     local goalsrc = love.audio.newSource('goal.wav', 'static')
     goalSFX = ripple.newSound(goalsrc)
 
+    local musicsrc = love.audio.newSource('pbycs.mp3', 'static')
+    local music = ripple.newSound(musicsrc)
 
+    music.loop = true
+    local instance = music:play()
 
 end
 
