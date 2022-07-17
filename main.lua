@@ -456,9 +456,9 @@ function love.update(dt)
             POWERUP.speedDown.isOnMap = true
         end
 
-        print(love.timer.getTime() - gameStartTimer)
+       
         if POWERUP.double.isOnMap ~= true and love.timer.getTime() - POWERUP.double.timer > POWERUP.double.dur then
-            print("visszakapcs")
+         
             POWERUP.double.isOnMap = true
         end
 
