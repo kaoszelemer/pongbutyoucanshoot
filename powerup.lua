@@ -8,14 +8,11 @@ POWERUP = {
                      
             if who == "bu" then
                 BULLET.x = 0
-                isShooting = false
-                print("player picked up speedup")
+                isShooting = false 
             elseif who == "en" then
                 ENEMYBULLET.x = SCREENWIDTH
                 isEnemyShooting = false
-                print("enemy picked up speedup")
             elseif who == "ba" then    
-                print("ball picked up speedup")
             end
             POWERUP.speedUp.isOnMap = false
         end,
