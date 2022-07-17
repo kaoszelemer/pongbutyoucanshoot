@@ -82,15 +82,29 @@ local function start()
 
 end
 
-local function bounce(x, y)
-    startShake(0.1,1)
-    BALL.vel.x = x * BALL.vel.x
-    BALL.vel.y = y * BALL.vel.y
+local function bounce(x, y, db)
 
-    if BALL.vel.x < 0 then
-        local instance = pongSFX:play()
+    if db == true then
+        startShake(0.1,1)
+        BALL2.vel.x = x * BALL2.vel.x
+        BALL2.vel.y = y * BALL2.vel.y
+    
+        if BALL.vel.x < 0 then
+            local instance = pongSFX:play()
+        else
+            local instance = pingSFX:play()
+        end
     else
-        local instance = pingSFX:play()
+
+        startShake(0.1,1)
+        BALL.vel.x = x * BALL.vel.x
+        BALL.vel.y = y * BALL.vel.y
+
+        if BALL.vel.x < 0 then
+            local instance = pongSFX:play()
+        else
+            local instance = pingSFX:play()
+        end
     end
 
 end
@@ -103,6 +117,10 @@ function resetPowerUp(s)
     if s == "sd" then
         POWERUP.speedDown.x = love.math.random(50, SCREENWIDTH - 50)
         POWERUP.speedDown.y = love.math.random(10, SCREENHEIGHT - 50)
+    end
+    if s == "db" then
+        POWERUP.double.x = SCREENWIDTH / 2
+        POWERUP.double.y = love.math.random(10, SCREENHEIGHT - 50)
     end
 end
 
@@ -179,21 +197,30 @@ local function checkPowerUpHitbox()
         local enemyBulletCol = checkCollision(ENEMYBULLET.x, ENEMYBULLET.y, ENEMYBULLET.width, ENEMYBULLET.height, POWERUP.double.x, POWERUP.double.y, POWERUP.double.img:getWidth(), POWERUP.double.img:getHeight())
         local ballCol = checkCollision(BALL.x, BALL.y, BALL.width, BALL.height, POWERUP.double.x, POWERUP.double.y, POWERUP.double.img:getWidth(), POWERUP.double.img:getHeight())
         
-        if bulletCol then
-            POWERUP.double.pickUp("pl")
-            POWERUP.double.action("pl")
+        if bulletCol and PLAYER.doubleShoot ~= true then
+            POWERUP.double.pickUp("bu")
+            POWERUP.double.action("bu")
+            POWERUP.double.timer = love.timer.getTime()
+        elseif bulletCol then
+            POWERUP.double.pickUp("bu")
             POWERUP.double.timer = love.timer.getTime()
         end
 
-        if enemyBulletCol then
+        if enemyBulletCol and ENEMY.doubleShoot ~= true then
             POWERUP.double.pickUp("en")
             POWERUP.double.action("en")
             POWERUP.double.timer = love.timer.getTime()
+        elseif enemyBulletCol then
+            POWERUP.double.pickUp("en")
+            POWERUP.double.timer = love.timer.getTime()
         end
 
-        if ballCol then
+        if ballCol and BALL.doubleball ~= true then
             POWERUP.double.pickUp("ba")  
             POWERUP.double.action("ba") 
+            POWERUP.double.timer = love.timer.getTime()
+        elseif ballCol then
+            POWERUP.double.pickUp("ba")  
             POWERUP.double.timer = love.timer.getTime()
         end
 
@@ -212,6 +239,9 @@ local function restart(b)
     PLAYER.vel = 3
     ENEMY.vel = 3
     BALL.vel.x = 4
+    PLAYER.doubleShoot = false
+    ENEMY.doubleShoot = false
+    BALL.doubleball = false
 
     if b then
         isStarting = true
@@ -222,6 +252,58 @@ local function restart(b)
         PLAYER.lives = 3
         ENEMY.HP = 10
         isGameOver = false
+       
+    end
+end
+
+local function updateShoot()
+    if isShooting  then
+        
+        BULLET.x = BULLET.x + BULLET.vel
+
+        if BULLET.x > SCREENWIDTH then
+            isShooting = false
+        end
+
+    end
+   
+    if PLAYER.doubleShoot then
+
+        if isShooting  then
+            BULLET.x = BULLET.x + BULLET.vel * 2
+                
+            if BULLET.x > SCREENWIDTH then
+                isShooting = false
+            end
+
+        end
+
+    end
+
+    if isEnemyShooting then
+    
+        ENEMYBULLET.x = ENEMYBULLET.x - ENEMYBULLET.vel
+
+        if ENEMYBULLET.x < 0 then
+        
+        isEnemyShooting = false
+        ENEMYBULLET.x = SCREENWIDTH
+        end
+    
+    end
+
+    if ENEMY.doubleShoot then
+        
+        if isEnemyShooting  then
+            
+            ENEMYBULLET.x = ENEMYBULLET.x - ENEMYBULLET.vel * 2
+                
+            if ENEMYBULLET.x < 0 then
+                isEnemyShooting = false
+            end
+
+        end
+
     end
 end
 
@@ -278,6 +360,19 @@ function love.load()
     BALL.width = BALL.img:getWidth()
     BALL.doubleball = false
 
+    BALL2 = {}
+    BALL2.img = love.graphics.newImage("ball.png")
+    BALL2.x = SCREENWIDTH / 2
+    BALL2.y = SCREENHEIGHT / 2
+    BALL2.vel = {}
+    BALL2.vel.x = 3
+    BALL2.vel.y = 1
+    BALL2.height = BALL.img:getHeight()
+    BALL2.width = BALL.img:getWidth()
+    
+
+   
+
     BULLET = {}
     BULLET.img = love.graphics.newImage("bullet.png")
     BULLET.x = 0
@@ -311,49 +406,60 @@ function love.update(dt)
 
         BALL.x = BALL.x + BALL.vel.x
         BALL.y = BALL.y + BALL.vel.y
+
+        if BALL.doubleball then
+            BALL2.x = BALL2.x + BALL2.vel.x
+            BALL2.y = BALL2.y + BALL2.vel.y
+        end
     
+        updateShoot()
 
-        if isShooting  then
-        
-            BULLET.x = BULLET.x + BULLET.vel
-        
-
-            if BULLET.x > SCREENWIDTH then
-                isShooting = false
-            end
-
-        
-        
-            
-        end
-
-
-
-        if isEnemyShooting then
-        
-            ENEMYBULLET.x = ENEMYBULLET.x - ENEMYBULLET.vel
-
-            if ENEMYBULLET.x < 0 then
-            
-            isEnemyShooting = false
-            ENEMYBULLET.x = SCREENWIDTH
-            end
-        
-        end
 
         --wall bouonce - Y irányú eltírites
 
-        if BALL.y < 0 + BALL.height then
+        if BALL.doubleball then
+            if BALL2.y < 0 + BALL2.height then
         
+                bounce(1, -1, true)
+            end
+    
+            if BALL2.y >= SCREENHEIGHT - BALL2.height then
+    
+                bounce(1, -1, true)
+            end
+        end
+
+        if BALL.y < 0 + BALL.height then  
             bounce(1, -1)
         end
 
         if BALL.y >= SCREENHEIGHT - BALL.height then
-
             bounce(1, -1)
         end
 
         -- AI
+        if BALL.doubleball then
+            
+            if BALL.x < SCREENWIDTH / 2 and BALL2.x > SCREENWIDTH / 2 then
+                if BALL2.y < ENEMY.y + PLAYER.imgHeight / 2  then
+                    ENEMY.y = ENEMY.y - ENEMY.vel
+                elseif BALL2.y > ENEMY.y + PLAYER.imgHeight / 2 then
+                    ENEMY.y = ENEMY.y + ENEMY.vel
+                end 
+            elseif BALL2.x < SCREENWIDTH / 2 and BALL.x > SCREENWIDTH / 2 then
+                if BALL.y < ENEMY.y + PLAYER.imgHeight / 2  then
+                    ENEMY.y = ENEMY.y - ENEMY.vel
+                elseif BALL.y > ENEMY.y + PLAYER.imgHeight / 2 then
+                    ENEMY.y = ENEMY.y + ENEMY.vel
+                end
+            else
+                if BALL.y < ENEMY.y + PLAYER.imgHeight / 2  then
+                    ENEMY.y = ENEMY.y - ENEMY.vel
+                elseif BALL.y > ENEMY.y + PLAYER.imgHeight / 2 then
+                    ENEMY.y = ENEMY.y + ENEMY.vel
+                end
+            end
+        end
 
         if BALL.y < ENEMY.y + PLAYER.imgHeight / 2  then
             ENEMY.y = ENEMY.y - ENEMY.vel
@@ -361,7 +467,26 @@ function love.update(dt)
             ENEMY.y = ENEMY.y + ENEMY.vel
         end
 
+
+
+
         --paddle bounce - X irány
+        if BALL.doubleball then
+            local paddle2Col = checkCollision(BALL2.x, BALL2.y, BALL2.width, BALL2.height, PLAYER.x, PLAYER.y, PLAYER.imgWidth, PLAYER.imgHeight)
+            local enemyPaddle2Col = checkCollision(BALL2.x, BALL2.y, BALL2.width, BALL2.height, ENEMY.x, ENEMY.y, PLAYER.imgWidth, PLAYER.imgHeight)
+            if paddle2Col then
+                bounce(-1,1, true)
+                BALL2.x = BALL2.x + BALL2.width / 2
+            end
+    
+            if enemyPaddle2Col then
+                bounce(-1,1, true)
+                BALL2.x = BALL2.x - BALL2.width / 2
+            end
+
+        end
+
+
         local paddleCol = checkCollision(BALL.x, BALL.y, BALL.width, BALL.height, PLAYER.x, PLAYER.y, PLAYER.imgWidth, PLAYER.imgHeight)
         local enemyPaddleCol = checkCollision(BALL.x, BALL.y, BALL.width, BALL.height, ENEMY.x, ENEMY.y, PLAYER.imgWidth, PLAYER.imgHeight)
 
@@ -376,6 +501,19 @@ function love.update(dt)
         end
 
         --goal
+
+        if BALL.doubleball then
+            if BALL2.x > SCREENWIDTH - 5 then
+               
+                local instance = goalSFX:play()
+                ENEMY.HP = ENEMY.HP - 2
+                restart(true)
+            elseif BALL2.x < 0 then
+                local instance = goalSFX:play()
+                PLAYER.lives = PLAYER.lives - 1
+                restart(true)
+            end
+        end
 
         if BALL.x > SCREENWIDTH - 5 then
             local instance = goalSFX:play()
@@ -545,6 +683,10 @@ function love.draw()
   --  
     if POWERUP.double.isOnMap then
         love.graphics.draw(POWERUP.double.img, POWERUP.double.x, POWERUP.double.y)
+    end
+
+    if BALL.doubleball then
+        love.graphics.draw(BALL2.img, BALL2.x, BALL2.y)
     end
 
 end

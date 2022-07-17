@@ -129,38 +129,50 @@ POWERUP = {
     double = {
 
         pickUp = function (who)
-            print("kolbasy")
+          
 
             if who == "bu" then
+                if PLAYER.doubleShoot then
+                    PLAYER.doubleShoot = false
+                end
                 BULLET.x = 0
                 isShooting = false
             elseif who == "en" then
+                if ENEMY.doubleShoot then
+                    ENEMY.doubleShoot = false
+                end
                 ENEMYBULLET.x = SCREENWIDTH
                 isEnemyShooting = false
             elseif who == "ba" then    
-            
+                if BALL.doubleball then
+                    BALL.doubleball = false
+                end
             end
             POWERUP.double.isOnMap = false
         end,
 
         img = love.graphics.newImage('double.png'),
-        x = love.math.random(50, SCREENWIDTH - 50),
-        y = love.math.random(50, SCREENHEIGHT - 50),
+        x = SCREENWIDTH / 2,
+        y = love.math.random(100, SCREENHEIGHT - 50),
         dur = 5,
         timer = love.timer.getTime(),
         isOnMap = false,
 
         action = function(who)
             
-            if who == "pl" then
+            if who == "bu" then
                 PLAYER.doubleShoot = true
+
             elseif who == "en" then
                 ENEMY.doubleShoot = true
             elseif who == "ba" then
+                BALL2.x = BALL.x
+                BALL2.y = BALL.y
+                BALL2.vel.x = BALL.vel.x * -1
                 BALL.doubleball = true
             end
             
-            
+            resetPowerUp("db")
         end
     }
 }
