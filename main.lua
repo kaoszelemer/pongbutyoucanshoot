@@ -240,12 +240,18 @@ local function restart(b)
     ENEMY.y = SCREENHEIGHT / 2 - PLAYER.imgHeight / 2
     BALL.x = SCREENWIDTH / 2
     BALL.y = SCREENHEIGHT / 2
+    BULLET.x = 0
+    BULLET.y = 0
+    ENEMYBULLET.x = 0
+    ENEMYBULLET.y = 0
     PLAYER.vel = 3
     ENEMY.vel = 3
     BALL.vel.x = 4
     PLAYER.doubleShoot = false
     ENEMY.doubleShoot = false
     BALL.doubleball = false
+    isShooting = false
+    isEnemyShooting = false
 
     if b then
         isStarting = true
