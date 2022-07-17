@@ -111,20 +111,25 @@ local function checkPowerUpHitbox()
     local yH = POWERUP.speedUp.y + POWERUP.speedUp.img:getHeight()
     local bx = BALL.x + BALL.width
     local by = BALL.y + BALL.height
-
+    print(BULLET.width)
     if POWERUP.speedUp.isOnMap then
         
-        if (BULLET.x >= POWERUP.speedUp.x) and (BULLET.y >= POWERUP.speedUp.y and BULLET.y <= yH) then
+        local bulletCol = checkCollision(BULLET.x, BULLET.y, BULLET.width, BULLET.height, POWERUP.speedUp.x, POWERUP.speedUp.y, POWERUP.speedUp.img:getWidth(), POWERUP.speedUp.img:getHeight())
+        local enemyBulletCol = checkCollision(ENEMYBULLET.x, ENEMYBULLET.y, ENEMYBULLET.width, ENEMYBULLET.height, POWERUP.speedUp.x, POWERUP.speedUp.y, POWERUP.speedUp.img:getWidth(), POWERUP.speedUp.img:getHeight())
+        local ballCol = checkCollision(BALL.x, BALL.y, BALL.width, BALL.height, POWERUP.speedUp.x, POWERUP.speedUp.y, POWERUP.speedUp.img:getWidth(), POWERUP.speedUp.img:getHeight())
+        
+        if bulletCol then
+            print("bulletCol")
             POWERUP.speedUp.pickUp("bu")    
             POWERUP.speedUp.action()
         end
 
-        if (ENEMYBULLET.x >= POWERUP.speedUp.x) and (ENEMYBULLET.y >= POWERUP.speedUp.y and ENEMYBULLET.y <= yH) then
+
+        if enemyBulletCol then
             POWERUP.speedUp.pickUp("en")  
             POWERUP.enemySpeedUp.action()
         end
 
-        local ballCol = checkCollision(BALL.x, BALL.y, BALL.width, BALL.height, POWERUP.speedUp.x, POWERUP.speedUp.y, POWERUP.speedUp.img:getWidth(), POWERUP.speedUp.img:getHeight())
 
         if ballCol then
             POWERUP.speedUp.pickUp("ba")  
@@ -135,20 +140,25 @@ local function checkPowerUpHitbox()
     end
 
     if POWERUP.speedDown.isOnMap then
-        if (BULLET.x >= POWERUP.speedDown.x) and (BULLET.y >= POWERUP.speedDown.y and BULLET.y <= yH) then
+
+        local bulletCol = checkCollision(BULLET.x, BULLET.y, BULLET.width, BULLET.height, POWERUP.speedDown.x, POWERUP.speedDown.y, POWERUP.speedDown.img:getWidth(), POWERUP.speedDown.img:getHeight())
+        local enemyBulletCol = checkCollision(ENEMYBULLET.x, ENEMYBULLET.y, ENEMYBULLET.width, ENEMYBULLET.height, POWERUP.speedDown.x, POWERUP.speedDown.y, POWERUP.speedDown.img:getWidth(), POWERUP.speedDown.img:getHeight())
+        local ballCol = checkCollision(BALL.x, BALL.y, BALL.width, BALL.height, POWERUP.speedDown.x, POWERUP.speedDown.y, POWERUP.speedDown.img:getWidth(), POWERUP.speedDown.img:getHeight())
+
+
+        if bulletCol then
             POWERUP.speedDown.pickUp("bu")  
             POWERUP.speedDown.action()
         end 
 
-        if (ENEMYBULLET.x >= POWERUP.speedDown.x) and (ENEMYBULLET.y >= POWERUP.speedDown.y and ENEMYBULLET.y <= yH) then
+        if enemyBulletCol then
             POWERUP.speedDown.pickUp("en")  
             POWERUP.enemySpeedDown.action()
             ENEMYBULLET.x = SCREENWIDTH
             isEnemyShooting = false
         end
 
-        local ballCol = checkCollision(BALL.x, BALL.y, BALL.width, BALL.height, POWERUP.speedDown.x, POWERUP.speedDown.y, POWERUP.speedDown.img:getWidth(), POWERUP.speedDown.img:getHeight())
-    
+           
         if ballCol then 
             POWERUP.speedDown.pickUp("ba")  
             POWERUP.ballSpeedDown.action() 
@@ -158,26 +168,27 @@ local function checkPowerUpHitbox()
     end
 
     if POWERUP.double.isOnMap then
+
+        local bulletCol = checkCollision(BULLET.x, BULLET.y, BULLET.width, BULLET.height, POWERUP.double.x, POWERUP.double.y, POWERUP.double.img:getWidth(), POWERUP.double.img:getHeight())
+        local enemyBulletCol = checkCollision(ENEMYBULLET.x, ENEMYBULLET.y, ENEMYBULLET.width, ENEMYBULLET.height, POWERUP.double.x, POWERUP.double.y, POWERUP.double.img:getWidth(), POWERUP.double.img:getHeight())
+        local ballCol = checkCollision(BALL.x, BALL.y, BALL.width, BALL.height, POWERUP.double.x, POWERUP.double.y, POWERUP.double.img:getWidth(), POWERUP.double.img:getHeight())
         
-        if PLAYER.doubleShoot ~= true then
-            if (BULLET.x >= POWERUP.double.x) and (BULLET.y >= POWERUP.double.y and BULLET.y <= yH) then
+        if bulletCol then
+          
                 POWERUP.double.action("pl")
-            end
+       
         end
 
-        if ENEMY.doubleShoot ~= true then
-            if (ENEMYBULLET.x >= POWERUP.double.x) and (ENEMYBULLET.y >= POWERUP.double.y and ENEMYBULLET.y <= yH) then
+        if enemyBulletCol then
+           
                 POWERUP.double.action("en")
-            end
+          
         end
 
-    
-    local ballCol = checkCollision(BALL.x, BALL.y, BALL.width, BALL.height, POWERUP.double.x, POWERUP.double.y, POWERUP.double.img:getWidth(), POWERUP.double.img:getHeight())
-
-    if ballCol then
-    --    POWERUP.double.pickUp("ba")  
-     --   POWERUP.ballSpeedUp.action() 
-    end
+        if ballCol then
+        --    POWERUP.double.pickUp("ba")  
+              POWERUP.double.action("ba") 
+        end
 
     end
 
@@ -265,7 +276,8 @@ function love.load()
     BULLET.x = 0
     BULLET.y = PLAYER.y + PLAYER.imgHeight / 2
     BULLET.vel = 10
-
+    BULLET.width = BULLET.img:getWidth()
+    BULLET.height = BULLET.img:getHeight()
 
 
     ENEMYBULLET = {}
@@ -273,6 +285,9 @@ function love.load()
     ENEMYBULLET.x = SCREENWIDTH
     ENEMYBULLET.y = ENEMY.y + PLAYER.imgHeight / 2
     ENEMYBULLET.vel = 9
+    ENEMYBULLET.width = ENEMYBULLET.img:getWidth()
+    ENEMYBULLET.height = ENEMYBULLET.img:getHeight()
+
 
     POWERUP.speedUp.modifier = 1
     POWERUP.speedDown.modifier = -1
@@ -340,13 +355,15 @@ function love.update(dt)
         end
 
         --paddle bounce - X irány
+        local paddleCol = checkCollision(BALL.x, BALL.y, BALL.width, BALL.height, PLAYER.x, PLAYER.y, PLAYER.imgWidth, PLAYER.imgHeight)
+        local enemyPaddleCol = checkCollision(BALL.x, BALL.y, BALL.width, BALL.height, ENEMY.x, ENEMY.y, PLAYER.imgWidth, PLAYER.imgHeight)
 
-        if BALL.x < PLAYER.x + PLAYER.imgWidth - BALL.width / 2 and BALL.y >= PLAYER.y and BALL.y <= PLAYER.y + PLAYER.imgHeight then
+        if paddleCol then
             bounce(-1,1)
             BALL.x = BALL.x + BALL.width / 2
         end
 
-        if BALL.x > ENEMY.x - BALL.width / 2 and BALL.y >= ENEMY.y and BALL.y <= ENEMY.y + PLAYER.imgHeight then
+        if enemyPaddleCol then
             bounce(-1,1)
             BALL.x = BALL.x - BALL.width / 2
         end
