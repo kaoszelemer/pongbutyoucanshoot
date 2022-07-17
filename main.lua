@@ -326,7 +326,11 @@ function love.load()
     love.graphics.setBackgroundColor(COLORS.bg)
 
     bannerImage = love.graphics.newImage("banner.png")
+    gameOverImage = love.graphics.newImage("gameover.png")
+    pressSpaceImage = love.graphics.newImage("pressspace.png")
+    pressSpaceRestartImage = love.graphics.newImage("pressspacerestart.png")
     hpImage = love.graphics.newImage("hp.png")
+
 
     loadSounds()
 
@@ -461,10 +465,13 @@ function love.update(dt)
             end
         end
 
-        if BALL.y < ENEMY.y + PLAYER.imgHeight / 2  then
-            ENEMY.y = ENEMY.y - ENEMY.vel
-        elseif BALL.y > ENEMY.y + PLAYER.imgHeight / 2 then
-            ENEMY.y = ENEMY.y + ENEMY.vel
+        if BALL.doubleball ~= true then
+
+            if BALL.y < ENEMY.y + PLAYER.imgHeight / 2  then
+                ENEMY.y = ENEMY.y - ENEMY.vel
+            elseif BALL.y > ENEMY.y + PLAYER.imgHeight / 2 then
+                ENEMY.y = ENEMY.y + ENEMY.vel
+            end
         end
 
 
@@ -623,7 +630,7 @@ function love.draw()
         love.graphics.translate(dx, dy)
     end
 
-    love.graphics.draw(bannerImage, SCREENHEIGHT / 2 - bannerImage:getWidth() / 3, 0) 
+    love.graphics.draw(bannerImage, 0, 0) 
    -- love.graphics.print("PONG BUT YOU CAN SHOOT", SCREENHEIGHT / 2, 0)
 
     love.graphics.draw(PLAYER.img, PLAYER.x, PLAYER.y )
@@ -632,7 +639,7 @@ function love.draw()
 
     love.graphics.draw(ENEMY.img, ENEMY.x, ENEMY.y)
  
-    love.graphics.print("HP:"..ENEMY.HP, SCREENWIDTH - 50, 0)
+   
     for i = 1, ENEMY.HP do
         love.graphics.draw(hpImage, ((SCREENWIDTH - SCREENWIDTH / 4) - 16) + i * 16, 1)
     end
@@ -640,14 +647,6 @@ function love.draw()
         love.graphics.draw(hpImage, 16*i, 1)
     end
 
-    if isGameOver then
-        love.graphics.print("PRESS SPACE TO RESTART", SCREENWIDTH / 2 - 65, SCREENHEIGHT / 4)
-    end
-
-    if isStarting and PLAYER.lives > 0 then
-        love.graphics.print("PRESS SPACE TO START", SCREENWIDTH / 2 - 65, SCREENHEIGHT / 4)
-        love.graphics.print("arrows - movement, s - shoot", SCREENWIDTH / 2 - 85, SCREENHEIGHT / 4 + 20)
-    end
 
     if DEBUG then
         love.graphics.print("PL VEL:"..PLAYER.vel, 0, 60)
@@ -660,9 +659,6 @@ function love.draw()
         love.graphics.print(ENEMY.y, ENEMY.x - 50, ENEMY.y)
     end
 
-    if isGameOver  then
-        love.graphics.print("GAME OVER", SCREENWIDTH / 2, SCREENHEIGHT / 2 - 20)
-    end
 
     if isShooting then
         
@@ -687,6 +683,16 @@ function love.draw()
 
     if BALL.doubleball then
         love.graphics.draw(BALL2.img, BALL2.x, BALL2.y)
+    end
+
+    
+    if isGameOver then
+        love.graphics.draw(gameOverImage, SCREENWIDTH / 2 - gameOverImage:getWidth() / 2, SCREENHEIGHT / 2 - gameOverImage:getHeight())
+        love.graphics.draw(pressSpaceRestartImage, SCREENWIDTH / 2 - pressSpaceImage:getWidth() / 2, SCREENHEIGHT / 2)
+    end
+
+    if isStarting and PLAYER.lives > 0 then
+        love.graphics.draw(pressSpaceImage, SCREENWIDTH / 2 - pressSpaceImage:getWidth() / 2, SCREENHEIGHT / 2 - (pressSpaceImage:getHeight()))
     end
 
 end
