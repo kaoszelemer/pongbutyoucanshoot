@@ -111,7 +111,7 @@ local function checkPowerUpHitbox()
     local yH = POWERUP.speedUp.y + POWERUP.speedUp.img:getHeight()
     local bx = BALL.x + BALL.width
     local by = BALL.y + BALL.height
-    print(BULLET.width)
+   
     if POWERUP.speedUp.isOnMap then
         
         local bulletCol = checkCollision(BULLET.x, BULLET.y, BULLET.width, BULLET.height, POWERUP.speedUp.x, POWERUP.speedUp.y, POWERUP.speedUp.img:getWidth(), POWERUP.speedUp.img:getHeight())
@@ -122,18 +122,21 @@ local function checkPowerUpHitbox()
             print("bulletCol")
             POWERUP.speedUp.pickUp("bu")    
             POWERUP.speedUp.action()
+            POWERUP.speedUp.timer = love.timer.getTime()
         end
 
 
         if enemyBulletCol then
             POWERUP.speedUp.pickUp("en")  
             POWERUP.enemySpeedUp.action()
+            POWERUP.speedUp.timer = love.timer.getTime()
         end
 
 
         if ballCol then
             POWERUP.speedUp.pickUp("ba")  
             POWERUP.ballSpeedUp.action() 
+            POWERUP.speedUp.timer = love.timer.getTime()
         end
  
 
@@ -149,6 +152,7 @@ local function checkPowerUpHitbox()
         if bulletCol then
             POWERUP.speedDown.pickUp("bu")  
             POWERUP.speedDown.action()
+            POWERUP.speedDown.timer = love.timer.getTime()
         end 
 
         if enemyBulletCol then
@@ -156,12 +160,14 @@ local function checkPowerUpHitbox()
             POWERUP.enemySpeedDown.action()
             ENEMYBULLET.x = SCREENWIDTH
             isEnemyShooting = false
+            POWERUP.speedDown.timer = love.timer.getTime()
         end
 
            
         if ballCol then 
             POWERUP.speedDown.pickUp("ba")  
             POWERUP.ballSpeedDown.action() 
+            POWERUP.speedDown.timer = love.timer.getTime()
         end
 
         
@@ -174,20 +180,21 @@ local function checkPowerUpHitbox()
         local ballCol = checkCollision(BALL.x, BALL.y, BALL.width, BALL.height, POWERUP.double.x, POWERUP.double.y, POWERUP.double.img:getWidth(), POWERUP.double.img:getHeight())
         
         if bulletCol then
-          
-                POWERUP.double.action("pl")
-       
+            POWERUP.double.pickUp("pl")
+            POWERUP.double.action("pl")
+            POWERUP.double.timer = love.timer.getTime()
         end
 
         if enemyBulletCol then
-           
-                POWERUP.double.action("en")
-          
+            POWERUP.double.pickUp("en")
+            POWERUP.double.action("en")
+            POWERUP.double.timer = love.timer.getTime()
         end
 
         if ballCol then
-        --    POWERUP.double.pickUp("ba")  
-              POWERUP.double.action("ba") 
+            POWERUP.double.pickUp("ba")  
+            POWERUP.double.action("ba") 
+            POWERUP.double.timer = love.timer.getTime()
         end
 
     end
@@ -449,7 +456,9 @@ function love.update(dt)
             POWERUP.speedDown.isOnMap = true
         end
 
+        print(love.timer.getTime() - gameStartTimer)
         if POWERUP.double.isOnMap ~= true and love.timer.getTime() - POWERUP.double.timer > POWERUP.double.dur then
+            print("visszakapcs")
             POWERUP.double.isOnMap = true
         end
 

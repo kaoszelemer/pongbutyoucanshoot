@@ -128,6 +128,21 @@ POWERUP = {
 
     double = {
 
+        pickUp = function (who)
+            print("kolbasy")
+
+            if who == "bu" then
+                BULLET.x = 0
+                isShooting = false
+            elseif who == "en" then
+                ENEMYBULLET.x = SCREENWIDTH
+                isEnemyShooting = false
+            elseif who == "ba" then    
+            
+            end
+            POWERUP.double.isOnMap = false
+        end,
+
         img = love.graphics.newImage('double.png'),
         x = love.math.random(50, SCREENWIDTH - 50),
         y = love.math.random(50, SCREENHEIGHT - 50),
