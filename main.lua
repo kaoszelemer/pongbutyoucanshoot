@@ -333,7 +333,7 @@ function love.load()
     isEnemyShooting = false
 
     love.window.setMode(SCREENWIDTH, SCREENHEIGHT)
-    love.window.setTitle("Pong csak lehet loni")
+    love.window.setTitle("Pong - But You Can Shoot")
     COLORS = {
 
         bg = {43 / 255, 15 / 255, 84 / 255}
