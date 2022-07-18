@@ -1,3 +1,7 @@
+--MADE BY: Attila Kiss - 2022.07.
+--PONG CSAK LEHET LŐNI
+
+
 DEBUG = false
 
 SCREENWIDTH = 720
