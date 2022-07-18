@@ -246,14 +246,15 @@ local function restart(b)
     BULLET.y = 0
     ENEMYBULLET.x = SCREENWIDTH
     ENEMYBULLET.y = 0
+    isShooting = false
+    isEnemyShooting = false
     PLAYER.vel = 3
     ENEMY.vel = 3
     BALL.vel.x = 4
     PLAYER.doubleShoot = false
     ENEMY.doubleShoot = false
     BALL.doubleball = false
-    isShooting = false
-    isEnemyShooting = false
+  
 
     if b then
         isStarting = true
@@ -265,7 +266,6 @@ local function restart(b)
         ENEMY.HP = 10
         isGameOver = false
         isYouWon = false
-       
     end
 end
 
@@ -364,7 +364,7 @@ function love.load()
     ENEMY.x = SCREENWIDTH - PLAYER.imgWidth
     ENEMY.y = SCREENHEIGHT / 2 - PLAYER.imgHeight / 2
     ENEMY.vel = 3
-    ENEMY.HP =10
+    ENEMY.HP = 10
     ENEMY.doubleShoot = false
 
     BALL = {}
@@ -551,6 +551,14 @@ function love.update(dt)
         if PLAYER.lives <= 0 then
             isGameOver = true
         end
+
+        
+        if ENEMY.HP <= 0 then
+            isGameOver = true
+            isYouWon = true
+        end
+
+
         
         if isShooting then
 
@@ -564,10 +572,6 @@ function love.update(dt)
                 isShooting = false
             
 
-                if ENEMY.HP < 1 then
-                    isGameOver = true
-                    isYouWon = true
-                end
             end
         end
         
@@ -706,13 +710,12 @@ function love.draw()
         love.graphics.draw(BALL2.img, BALL2.x, BALL2.y)
     end
 
-    
-    if isGameOver then
+    if isYouWon and isGameOver then
+        love.graphics.draw(youWonImage, SCREENWIDTH / 2 - youWonImage:getWidth() / 2, 100)
+        love.graphics.draw(pressSpaceRestartImage, SCREENWIDTH / 2 - pressSpaceImage:getWidth() / 2, SCREENHEIGHT / 2) 
+    elseif isGameOver then
         love.graphics.draw(gameOverImage, SCREENWIDTH / 2 - gameOverImage:getWidth() / 2, SCREENHEIGHT / 2 - gameOverImage:getHeight())
-        love.graphics.draw(pressSpaceRestartImage, SCREENWIDTH / 2 - pressSpaceImage:getWidth() / 2, SCREENHEIGHT / 2)
-        if isYouWon then
-            love.graphics.draw(youWonImage, SCREENWIDTH / 2 - youWonImage:getWidth() / 2, 100)
-        end
+        love.graphics.draw(pressSpaceRestartImage, SCREENWIDTH / 2 - pressSpaceImage:getWidth() / 2, SCREENHEIGHT / 2) 
     end
 
     if isStarting and PLAYER.lives > 0 then
