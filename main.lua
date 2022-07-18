@@ -69,6 +69,7 @@ end
 
 local function enemyShoot(y)
     ENEMYBULLET.y = y
+   
     local instance = shootSFX:play()
 end
 
@@ -142,7 +143,7 @@ local function checkPowerUpHitbox()
         local ballCol = checkCollision(BALL.x, BALL.y, BALL.width, BALL.height, POWERUP.speedUp.x, POWERUP.speedUp.y, POWERUP.speedUp.img:getWidth(), POWERUP.speedUp.img:getHeight())
         
         if bulletCol then
-            print("bulletCol")
+         
             POWERUP.speedUp.pickUp("bu")    
             POWERUP.speedUp.action()
             POWERUP.speedUp.timer = love.timer.getTime()
@@ -243,7 +244,7 @@ local function restart(b)
     BALL.y = SCREENHEIGHT / 2
     BULLET.x = 0
     BULLET.y = 0
-    ENEMYBULLET.x = 0
+    ENEMYBULLET.x = SCREENWIDTH
     ENEMYBULLET.y = 0
     PLAYER.vel = 3
     ENEMY.vel = 3
@@ -263,6 +264,7 @@ local function restart(b)
         PLAYER.lives = 3
         ENEMY.HP = 10
         isGameOver = false
+        isYouWon = false
        
     end
 end
@@ -337,6 +339,7 @@ function love.load()
     love.graphics.setBackgroundColor(COLORS.bg)
 
     bannerImage = love.graphics.newImage("banner.png")
+    youWonImage = love.graphics.newImage("youwon.png")
     gameOverImage = love.graphics.newImage("gameover.png")
     pressSpaceImage = love.graphics.newImage("pressspace.png")
     pressSpaceRestartImage = love.graphics.newImage("pressspacerestart.png")
@@ -361,7 +364,7 @@ function love.load()
     ENEMY.x = SCREENWIDTH - PLAYER.imgWidth
     ENEMY.y = SCREENHEIGHT / 2 - PLAYER.imgHeight / 2
     ENEMY.vel = 3
-    ENEMY.HP = 10
+    ENEMY.HP =10
     ENEMY.doubleShoot = false
 
     BALL = {}
@@ -551,8 +554,9 @@ function love.update(dt)
         
         if isShooting then
 
+            local bulletCol = checkCollision(BULLET.x, BULLET.y, BULLET.width, BULLET.height, ENEMY.x, ENEMY.y, PLAYER.imgWidth, PLAYER.imgHeight)
         
-            if BULLET.x >= ENEMY.x and (BULLET.y < ENEMY.y + PLAYER.imgHeight and BULLET.y > ENEMY.y) then
+            if bulletCol then
             
                 ENEMY.HP = ENEMY.HP - 1
                 BULLET.x = 0
@@ -560,8 +564,9 @@ function love.update(dt)
                 isShooting = false
             
 
-                if ENEMY.HP == 0 then
+                if ENEMY.HP < 1 then
                     isGameOver = true
+                    isYouWon = true
                 end
             end
         end
@@ -575,13 +580,16 @@ function love.update(dt)
             
         end
 
-        if isEnemyShooting then
-           
-            if ENEMYBULLET.x == PLAYER.x and (ENEMYBULLET.y < PLAYER.y + PLAYER.imgHeight and ENEMYBULLET.y > PLAYER.y) then
-                PLAYER.lives = PLAYER.lives - 1
-                local instance = hitSFX:play()
-            end
+
+        local enbulletCol = checkCollision(PLAYER.x, PLAYER.y, PLAYER.imgWidth, PLAYER.imgHeight, ENEMYBULLET.x, ENEMYBULLET.y, ENEMYBULLET.width, ENEMYBULLET.height)
+       
+        if enbulletCol ~= false then
+            PLAYER.lives = PLAYER.lives - 1
+            ENEMYBULLET.x = SCREENWIDTH - PLAYER.imgWidth
+            local instance = hitSFX:play()
         end
+
+     
 
         checkPowerUpHitbox()
 
@@ -702,6 +710,9 @@ function love.draw()
     if isGameOver then
         love.graphics.draw(gameOverImage, SCREENWIDTH / 2 - gameOverImage:getWidth() / 2, SCREENHEIGHT / 2 - gameOverImage:getHeight())
         love.graphics.draw(pressSpaceRestartImage, SCREENWIDTH / 2 - pressSpaceImage:getWidth() / 2, SCREENHEIGHT / 2)
+        if isYouWon then
+            love.graphics.draw(youWonImage, SCREENWIDTH / 2 - youWonImage:getWidth() / 2, 100)
+        end
     end
 
     if isStarting and PLAYER.lives > 0 then
